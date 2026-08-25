@@ -1,4 +1,9 @@
+<p align="center">
+  <img src="nexo_logo.png" alt="Nexo Logo" width="120" />
+</p>
+
 <h1 align="center">NEXO</h1>
+
 <p align="center"><em>Repositório para o Projeto Integrador 2026.2</em></p>
 
 ---
