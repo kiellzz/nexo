@@ -8,9 +8,10 @@ import {
   useNavigate,
   useParams,
 } from 'react-router-dom'
+import { LoginPage } from './pages/Login'
+import { SignupPage } from './pages/Signup'
+import type { UserRole } from './types'
 import './App.css'
-
-type UserRole = 'startup' | 'investor'
 
 type Startup = {
   id: number
@@ -66,35 +67,35 @@ const startups: Startup[] = [
     sector: 'Logística IA',
     stage: 'Série A',
     city: 'São Paulo - SP',
-    match: 92,
+    match: 94,
     investment: 'R$ 1,2M',
-    description: 'Plataforma de otimização de rotas com inteligência artificial para transporte urbano.',
+    description: 'Plataforma de otimização de frotas e rotas com inteligência artificial preditiva para grandes centros urbanos.',
     team: '18 pessoas',
     model: 'SaaS B2B',
   },
   {
     id: 2,
     name: 'VitaSol',
-    sector: 'Saúde digital',
+    sector: 'Saúde Digital',
     stage: 'Pré-semente',
     city: 'Rio de Janeiro - RJ',
-    match: 88,
+    match: 89,
     investment: 'R$ 450k',
-    description: 'Monitoramento remoto de pacientes e triagem inteligente para clínicas e redes.',
+    description: 'Monitoramento remoto de pacientes crônicos e triagem inteligente para hospitais e planos de saúde.',
     team: '11 pessoas',
     model: 'B2B2C',
   },
   {
     id: 3,
     name: 'GreenGrid',
-    sector: 'Energia limpa',
+    sector: 'Energia Limpa',
     stage: 'Seed',
     city: 'Belo Horizonte - MG',
-    match: 86,
+    match: 88,
     investment: 'R$ 780k',
-    description: 'Infraestrutura de gestão energética para condomínios e pequenas redes industriais.',
+    description: 'Infraestrutura de gestão e eficiência energética automatizada para condomínios e indústrias sustentáveis.',
     team: '22 pessoas',
-    model: 'Marketplace energético',
+    model: 'Marketplace Energético',
   },
 ]
 
@@ -102,75 +103,75 @@ const investors: Investor[] = [
   {
     id: 1,
     name: 'Helena Costa',
-    type: 'Anjo',
-    focus: ['IA', 'Saúde', 'B2B'],
+    type: 'Investidora Anjo',
+    focus: ['IA', 'Saúde', 'B2B SaaS'],
     city: 'Belo Horizonte - MG',
-    match: 91,
+    match: 96,
     ticket: 'R$ 300k - R$ 1M',
-    thesis: 'Investimento em negócios com escalabilidade e defensabilidade operacional.',
-    description: 'Investidora especialista em negócios de operação leve e forte potencial de automação.',
+    thesis: 'Investimento em negócios digitais com alta tração, margens saudáveis e defensabilidade operacional comprovada.',
+    description: 'Ex-fundadora de scale-up com foco em automação empresarial, inteligência artificial e plataformas de saúde.',
   },
   {
     id: 2,
     name: 'Atlas Ventures',
-    type: 'Fundo',
-    focus: ['Sustentabilidade', 'Energia', 'Clima'],
+    type: 'Venture Capital',
+    focus: ['Sustentabilidade', 'Energia', 'ClimateTech'],
     city: 'São Paulo - SP',
-    match: 89,
+    match: 91,
     ticket: 'R$ 2M - R$ 8M',
-    thesis: 'Foco em energia, infraestrutura e plataformas que reduzem desperdício e melhoram eficiência.',
-    description: 'Fundo de capital com foco em energia, infraestrutura e impactos ambientais.',
+    thesis: 'Foco em infraestrutura energética, transição de carbono e plataformas que otimizam o consumo de recursos vitais.',
+    description: 'Fundo institucional de capital semente e Série A focado em sustentabilidade e impacto na América Latina.',
   },
   {
     id: 3,
     name: 'North Capital',
-    type: 'Fundo',
+    type: 'Venture Capital',
     focus: ['Fintech', 'Logística', 'Enterprise'],
     city: 'Curitiba - PR',
-    match: 84,
+    match: 86,
     ticket: 'R$ 1M - R$ 5M',
-    thesis: 'Apoia empresas em fase de expansão com base em dados e eficiência operacional.',
-    description: 'Fundo com foco em expansão e empresas de software e operação inteligente.',
+    thesis: 'Apoia scale-ups que digitalizam cadeias tradicionais através de software analítico e integração financeira.',
+    description: 'Fundo com mais de 30 startups investidas no Brasil e forte rede de mentores estratégicos.',
   },
 ]
 
 const opportunities: Opportunity[] = [
   {
     id: 1,
-    name: 'Rodovias do Futuro',
-    type: 'Round',
-    sector: 'Logística',
-    description: 'Abertura de rodada para escala do produto em logística urbana e entregas inteligentes.',
+    name: 'Rodovias do Futuro (NovaFlow)',
+    type: 'Rodada Aberta',
+    sector: 'Logística & IA',
+    description: 'Captação para acelerar expansão geográfica, contratação de talentos de engenharia e novos algoritmos de roteamento.',
     location: 'São Paulo - SP',
     value: 'R$ 1,8M',
     stage: 'Série A',
-    match: 94,
+    match: 95,
     date: '12 mar',
     status: 'Ativa',
   },
   {
     id: 2,
-    name: 'Acesso Saúde',
+    name: 'Acesso Saúde Conectada',
     type: 'Aceleração',
-    sector: 'Saúde',
-    description: 'Programa de aceleração para clínicas e plataformas de triagem digital.',
+    sector: 'HealthTech',
+    description: 'Programa de aceleração corporativa com validação clínica em rede de 40 hospitais parceiros.',
     location: 'Rio de Janeiro - RJ',
     value: 'R$ 600k',
     stage: 'Seed',
-    match: 90,
+    match: 91,
     date: '18 mar',
     status: 'Nova',
   },
   {
     id: 3,
-    name: 'Energia Inteligente',
-    type: 'Investimento',
-    sector: 'Energia',
-    description: 'Oportunidade para crescimento de operação em gestão energética de prediais e fábricas.',
+    name: 'Energia Solar Inteligente',
+    type: 'Investimento Co-Lead',
+    sector: 'CleanTech',
+    description: 'Oportunidade de co-investimento para escala de hardware IoT e software de telemetria solar.',
     location: 'Belo Horizonte - MG',
     value: 'R$ 2,2M',
     stage: 'Série A',
-    match: 87,
+    match: 89,
     date: '22 mar',
     status: 'Ativa',
   },
@@ -181,11 +182,11 @@ const matchCards: MatchItem[] = [
     id: 1,
     name: 'NovaFlow',
     type: 'startup',
-    match: 92,
+    match: 94,
     reasons: [
-      { label: 'Segmento', value: 96 },
-      { label: 'Localização', value: 88 },
-      { label: 'Estágio', value: 91 },
+      { label: 'Segmento & Tese', value: 98 },
+      { label: 'Momento de Tração', value: 92 },
+      { label: 'Faixa de Ticket', value: 94 },
     ],
   },
   {
@@ -194,33 +195,39 @@ const matchCards: MatchItem[] = [
     type: 'startup',
     match: 90,
     reasons: [
-      { label: 'Segmento', value: 94 },
-      { label: 'Localização', value: 82 },
-      { label: 'Estágio', value: 90 },
+      { label: 'Fit Setorial', value: 95 },
+      { label: 'Equipe & Governança', value: 88 },
+      { label: 'Estágio de Maturidade', value: 91 },
     ],
   },
   {
     id: 3,
     name: 'Helena Costa',
     type: 'investor',
-    match: 91,
+    match: 96,
     reasons: [
-      { label: 'Área', value: 96 },
-      { label: 'Ticket', value: 86 },
-      { label: 'Faixa', value: 89 },
+      { label: 'Alinhamento de Tese', value: 99 },
+      { label: 'Disponibilidade de Capital', value: 95 },
+      { label: 'Sinergia de Mentoria', value: 94 },
     ],
   },
 ]
 
 const matches = [
-  { label: 'Segmento', value: 96 },
-  { label: 'Localização', value: 88 },
-  { label: 'Estágio', value: 91 },
-  { label: 'Ticket', value: 81 },
-  { label: 'Mercado', value: 93 },
+  { label: 'Segmento & Tese', value: 96 },
+  { label: 'Estágio & Maturidade', value: 92 },
+  { label: 'Faixa de Ticket', value: 89 },
+  { label: 'Localização & Expansão', value: 94 },
+  { label: 'Potencial de Mercado', value: 95 },
 ]
 
-const navItems = ['Início', 'Como funciona', 'Startups', 'Investidores', 'Sobre']
+const navItems = [
+  { label: 'Início', href: '/' },
+  { label: 'Como funciona', href: '/#como-funciona' },
+  { label: 'Startups', href: '/buscar' },
+  { label: 'Investidores', href: '/buscar' },
+  { label: 'Oportunidades', href: '/oportunidades' },
+]
 
 function App() {
   return (
@@ -237,22 +244,34 @@ function AppContent() {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <Link to="/" className="brand" aria-label="Ir para a página inicial">
-          <img src="/logo.png" alt="Nexo logo" className="brand-logo" />
-          <span className="brand-name">Nexo</span>
-        </Link>
+        <div className="topbar-inner">
+          <Link to="/" className="brand" aria-label="Ir para a página inicial">
+            <div className="brand-logo-wrap">
+              <img src="/logo.png" alt="Nexo logo" className="brand-logo" />
+            </div>
+            <span className="brand-name">Nexo</span>
+          </Link>
 
-        <nav className="main-nav" aria-label="Navegação principal">
-          {navItems.map((item) => (
-            <Link key={item} to="/" className="nav-link">
-              {item}
+          <nav className="main-nav" aria-label="Navegação principal">
+            {navItems.map((item) => (
+              <Link key={item.label} to={item.href} className="nav-link">
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="nav-actions">
+            <Link to="/login" className="btn btn-nav-secondary">
+              Entrar
             </Link>
-          ))}
-        </nav>
-
-        <div className="nav-actions">
-          <Link to="/login" className="btn btn-secondary">Entrar</Link>
-          <Link to="/signup" className="btn btn-primary">Criar conta</Link>
+            <Link to="/signup" className="btn btn-primary btn-nav-cta">
+              <span>Criar conta</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -273,15 +292,55 @@ function AppContent() {
       </main>
 
       <footer className="footer">
-        <Link to="/" className="footer-brand">
-          <img src="/logo.png" alt="Nexo logo" className="brand-logo small" />
-          <span className="brand-name">Nexo</span>
-        </Link>
-        <div className="footer-links">
-          <Link to="/privacidade">Termos de uso</Link>
-          <Link to="/privacidade">Política de privacidade</Link>
-          <Link to="/privacidade">LGPD</Link>
-          <a href="#">LinkedIn</a>
+        <div className="footer-top">
+          <div className="footer-brand-column">
+            <Link to="/" className="brand">
+              <div className="brand-logo-wrap small">
+                <img src="/logo.png" alt="Nexo logo" className="brand-logo small" />
+              </div>
+              <span className="brand-name">Nexo</span>
+            </Link>
+            <p className="footer-tagline">
+              A plataforma inteligente que conecta startups escaláveis aos investidores certos com inteligência e precisão.
+            </p>
+          </div>
+
+          <div className="footer-links-grid">
+            <div className="footer-col">
+              <h4>Plataforma</h4>
+              <Link to="/buscar">Buscar Startups</Link>
+              <Link to="/buscar">Buscar Investidores</Link>
+              <Link to="/oportunidades">Rodadas Abertas</Link>
+              <Link to="/signup">Cadastrar Empresa</Link>
+            </div>
+            <div className="footer-col">
+              <h4>Navegação</h4>
+              <Link to="/">Início</Link>
+              <Link to="/#como-funciona">Como Funciona</Link>
+              <Link to="/dashboard">Dashboard</Link>
+              <Link to="/matches">Matches</Link>
+            </div>
+            <div className="footer-col">
+              <h4>Institucional & Legal</h4>
+              <Link to="/privacidade">Termos de Uso</Link>
+              <Link to="/privacidade">Política de Privacidade</Link>
+              <Link to="/privacidade">LGPD & Segurança</Link>
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">LinkedIn Oficial</a>
+            </div>
+          </div>
+        </div>
+
+        <div className="footer-bottom">
+          <p>© {new Date().getFullYear()} Nexo Tecnologia S.A. Todos os direitos reservados.</p>
+          <div className="footer-badges">
+            <span className="secure-badge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              Conexões Criptografadas & LGPD Compliant
+            </span>
+          </div>
         </div>
       </footer>
     </div>
@@ -290,95 +349,312 @@ function AppContent() {
 
 function LandingPage() {
   return (
-    <>
-      <section className="hero-section">
-        <div className="hero-copy">
-          <span className="eyebrow">Conecte capital e inovação</span>
-          <h1>Conectamos startups às oportunidades certas de investimento.</h1>
-          <p>
-            Descubra investidores com visão, encontre negócios compatíveis e acelere a próxima etapa da sua jornada.
-          </p>
-          <div className="cta-row">
-            <Link to="/signup" className="btn btn-primary">Começar agora</Link>
-            <Link to="/buscar" className="btn btn-ghost">Explorar oportunidades</Link>
-          </div>
-          <div className="hero-stats">
-            <div>
-              <strong>1.2k+</strong>
-              <span>Startups ativas</span>
-            </div>
-            <div>
-              <strong>320</strong>
-              <span>Investidores</span>
-            </div>
-            <div>
-              <strong>94%</strong>
-              <span>Compatibilidade</span>
-            </div>
-          </div>
+    <div className="landing-wrapper">
+      {/* FULL-WIDTH HERO SECTION WITH VIDEO BACKGROUND */}
+      <section className="hero-section-full">
+        <div className="hero-video-container">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="hero-video-bg"
+            poster="/handshake.png"
+          >
+            <source src="/handshake.mp4" type="video/mp4" />
+            Seu navegador não suporta vídeos em HTML5.
+          </video>
+          <div className="hero-overlay" />
+          <div className="hero-glow-orb orb-1" />
+          <div className="hero-glow-orb orb-2" />
         </div>
 
-        <div className="hero-visual" aria-label="Prévia visual da plataforma">
-          <div className="network-card">
-            <div className="node a"></div>
-            <div className="node b"></div>
-            <div className="node c"></div>
-            <div className="node d"></div>
-            <div className="connector connector-1"></div>
-            <div className="connector connector-2"></div>
-            <div className="connector connector-3"></div>
-            <div className="connector connector-4"></div>
+        <div className="hero-content-container">
+          <div className="hero-copy">
+            <div className="eyebrow-badge">
+              <span className="pulse-dot" />
+              <span>Conecte Capital & Inovação</span>
+            </div>
+
+            <h1 className="hero-title">
+              Conectamos <span className="highlight-text">startups</span> às oportunidades certas de <span className="highlight-gradient">investimento</span>.
+            </h1>
+
+            <p className="hero-description">
+              Descubra investidores com visão alinhada, encontre negócios de alto crescimento validados por dados e acelere a próxima etapa da sua jornada com precisão.
+            </p>
+
+            <div className="cta-row">
+              <Link to="/signup" className="btn btn-primary btn-glow btn-lg">
+                <span>Começar agora</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </Link>
+              <Link to="/buscar" className="btn btn-glass btn-lg">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <span>Explorar oportunidades</span>
+              </Link>
+            </div>
+
+            <div className="hero-stats-bar">
+              <div className="stat-item">
+                <div className="stat-number">1.2k<span className="stat-plus">+</span></div>
+                <div className="stat-label">Startups Ativas</div>
+              </div>
+              <div className="stat-divider" />
+              <div className="stat-item">
+                <div className="stat-number">320<span className="stat-plus">+</span></div>
+                <div className="stat-label">Investidores Qualificados</div>
+              </div>
+              <div className="stat-divider" />
+              <div className="stat-item">
+                <div className="stat-number">94<span className="stat-pct">%</span></div>
+                <div className="stat-label">Taxa de Match Assertivo</div>
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT FLOATING GLASS CARD */}
+          <div className="hero-interactive-card">
+            <div className="match-showcase-card">
+              <div className="match-card-header">
+                <div className="badge-live">
+                  <span className="live-indicator" />
+                  <span>Match em Tempo Real</span>
+                </div>
+                <span className="match-score-pill">96% Compatibilidade</span>
+              </div>
+
+              <div className="match-parties">
+                <div className="party-box startup-box">
+                  <div className="party-icon">🚀</div>
+                  <div>
+                    <h4>NovaFlow</h4>
+                    <p>SaaS B2B • Logística IA</p>
+                  </div>
+                </div>
+
+                <div className="match-connector">
+                  <div className="connector-line" />
+                  <div className="connector-badge">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                  </div>
+                </div>
+
+                <div className="party-box investor-box">
+                  <div className="party-icon">💎</div>
+                  <div>
+                    <h4>Helena Costa</h4>
+                    <p>Investidora Anjo • Ticket até R$ 1M</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="match-reasons-preview">
+                <div className="reason-item">
+                  <div className="reason-header">
+                    <span>Tese & Mercado</span>
+                    <strong>98%</strong>
+                  </div>
+                  <div className="progress-track">
+                    <div className="progress-fill" style={{ width: '98%' }} />
+                  </div>
+                </div>
+                <div className="reason-item">
+                  <div className="reason-header">
+                    <span>Ticket & Estágio</span>
+                    <strong>94%</strong>
+                  </div>
+                  <div className="progress-track">
+                    <div className="progress-fill" style={{ width: '94%' }} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="match-card-footer">
+                <span className="status-note">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  Conexão imediata recomendada pelo algoritmo
+                </span>
+              </div>
+            </div>
+
+            {/* FLOATING BADGE */}
+            <div className="floating-metric-badge float-1">
+              <span className="badge-icon">💼</span>
+              <div>
+                <strong>R$ 48M+</strong>
+                <p>Volume em Negociação</p>
+              </div>
+            </div>
+
+            <div className="floating-metric-badge float-2">
+              <span className="badge-icon">⚡</span>
+              <div>
+                <strong>3x mais rápido</strong>
+                <p>Tempo médio até o Term Sheet</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="info-panel">
-        <div>
-          <p className="label">Como funciona</p>
-          <h2>Seu fluxo em 4 passos</h2>
+      {/* HOW IT WORKS SECTION */}
+      <section className="info-panel" id="como-funciona">
+        <div className="section-header-center">
+          <span className="label-badge">Metodologia Nexo</span>
+          <h2>Seu fluxo em 4 passos inteligentes</h2>
+          <p className="section-subtitle">Processo estruturado para maximizar conexões de valor e minimizar tempo desperdiçado em reuniões desalinhadas.</p>
         </div>
+
         <div className="steps-grid">
-          {['Crie seu perfil', 'Encontre oportunidades', 'Conheça perfis compatíveis', 'Conecte-se'].map((step, index) => (
-            <article key={step} className="step-card">
-              <span className="step-number">0{index + 1}</span>
-              <h3>{step}</h3>
-              <p>Estruture seu posicionamento e receba combinações relevantes para o próximo passo.</p>
+          {[
+            {
+              num: '01',
+              title: 'Crie seu perfil detalhado',
+              desc: 'Cadastre sua startup ou tese de investimento com dados de tração, mercado, métricas-chave e estágio.',
+              icon: (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              ),
+            },
+            {
+              num: '02',
+              title: 'Algoritmo de Compatibilidade',
+              desc: 'Nossa engine cruza segmentos, ticket médio, governança e momento de captação para gerar scores de alinhamento.',
+              icon: (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"></path>
+                  <line x1="2" y1="20" x2="2.01" y2="20"></line>
+                </svg>
+              ),
+            },
+            {
+              num: '03',
+              title: 'Analise Oportunidades & Matches',
+              desc: 'Receba recomendações curadas com percentual de compatibilidade e detalhamento transparente dos fatores de afinidade.',
+              icon: (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+              ),
+            },
+            {
+              num: '04',
+              title: 'Conexão Direta & Negociação',
+              desc: 'Inicie conversas com decisores qualificados e acelere o fechamento da rodada com segurança e privacidade.',
+              icon: (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+              ),
+            },
+          ].map((step) => (
+            <article key={step.num} className="step-card">
+              <div className="step-card-header">
+                <div className="step-icon-wrap">{step.icon}</div>
+                <span className="step-number">{step.num}</span>
+              </div>
+              <h3>{step.title}</h3>
+              <p>{step.desc}</p>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="benefit-grid">
-        <article className="benefit-card blue">
-          <p className="label">Para startups</p>
-          <h3>Encontre investidores com alinhamento estratégico</h3>
-          <ul>
-            <li>Encontrar investidores</li>
-            <li>Apresentar sua empresa</li>
-            <li>Encontrar investimentos compatíveis</li>
-            <li>Aumentar visibilidade</li>
-          </ul>
-        </article>
+      {/* BENEFIT BENTO SECTION */}
+      <section className="benefit-section">
+        <div className="benefit-grid">
+          <article className="benefit-card blue-gradient">
+            <div className="benefit-badge">Para Startups em Captação</div>
+            <h3>Encontre investidores com alinhamento estratégico real</h3>
+            <p className="benefit-lead">
+              Apresente sua empresa para investidores que realmente compreendem o seu setor e têm capital alocado para o seu estágio.
+            </p>
+            <ul className="benefit-list">
+              <li>
+                <div className="check-circle">✓</div>
+                <span>Acesso direto a fundos de VC, investidores anjo e family offices</span>
+              </li>
+              <li>
+                <div className="check-circle">✓</div>
+                <span>Métricas de compatibilidade para priorizar as melhores abordagens</span>
+              </li>
+              <li>
+                <div className="check-circle">✓</div>
+                <span>Mais visibilidade qualificada sem spam ou perda de tempo</span>
+              </li>
+              <li>
+                <div className="check-circle">✓</div>
+                <span>Deck e dados de tração apresentados de forma estruturada e segura</span>
+              </li>
+            </ul>
+            <div className="benefit-action">
+              <Link to="/signup" className="btn btn-primary">
+                Cadastrar minha startup →
+              </Link>
+            </div>
+          </article>
 
-        <article className="benefit-card teal">
-          <p className="label">Para investidores</p>
-          <h3>Descubra negócios com potencial e clareza</h3>
-          <ul>
-            <li>Descobrir startups</li>
-            <li>Filtrar oportunidades</li>
-            <li>Definir áreas de interesse</li>
-            <li>Encontrar negócios compatíveis</li>
-          </ul>
-        </article>
+          <article className="benefit-card teal-gradient">
+            <div className="benefit-badge teal">Para Investidores & Fundos</div>
+            <h3>Descubra negócios promissores com inteligência e clareza</h3>
+            <p className="benefit-lead">
+              Filtre o dealflow com critérios rigorosos de tese, ticket, geografia e estágio para encontrar apenas oportunidades compatíveis.
+            </p>
+            <ul className="benefit-list">
+              <li>
+                <div className="check-circle teal">✓</div>
+                <span>Dealflow pré-filtrado de acordo com a sua tese de investimentos</span>
+              </li>
+              <li>
+                <div className="check-circle teal">✓</div>
+                <span>Análise rápida de tração, modelo de negócio e equipe fundadora</span>
+              </li>
+              <li>
+                <div className="check-circle teal">✓</div>
+                <span>Notificações em tempo real sobre novas startups compatíveis</span>
+              </li>
+              <li>
+                <div className="check-circle teal">✓</div>
+                <span>Contato direto com os fundadores em um ambiente confidencial</span>
+              </li>
+            </ul>
+            <div className="benefit-action">
+              <Link to="/buscar" className="btn btn-teal">
+                Explorar oportunidades →
+              </Link>
+            </div>
+          </article>
+        </div>
       </section>
 
+      {/* FEATURED OPPORTUNITIES PREVIEW */}
       <section className="opportunity-preview">
         <div className="section-header">
           <div>
-            <p className="label">Oportunidades em destaque</p>
-            <h2>Matches e negócios com forte alinhamento</h2>
+            <span className="label-badge">Portfólio & Rodadas</span>
+            <h2>Oportunidades em Destaque</h2>
+            <p className="section-desc">Startups selecionadas com rodadas de investimento ativas na plataforma.</p>
           </div>
-          <Link to="/buscar" className="btn btn-secondary">Ver mais</Link>
+          <Link to="/buscar" className="btn btn-secondary">
+            Ver todas as oportunidades
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </Link>
         </div>
 
         <div className="opportunities-grid">
@@ -386,171 +662,61 @@ function LandingPage() {
             <article key={op.id} className="opportunity-card">
               <div className="card-topline">
                 <span className="pill">{op.type}</span>
-                <span className="match-badge">{op.match}%</span>
+                <span className="match-badge">
+                  <span className="badge-dot" />
+                  {op.match}% Match
+                </span>
               </div>
               <h3>{op.name}</h3>
-              <p>{op.sector}</p>
-              <ul>
-                <li>{op.stage}</li>
-                <li>{op.value}</li>
-                <li>{op.date}</li>
-              </ul>
+              <p className="opportunity-sector">
+                <span className="sector-tag">{op.sector}</span> • <span>{op.location}</span>
+              </p>
+              <p className="opportunity-desc">{op.description}</p>
+              
+              <div className="card-metrics-row">
+                <div className="metric-box">
+                  <span>Estágio</span>
+                  <strong>{op.stage}</strong>
+                </div>
+                <div className="metric-box">
+                  <span>Valor Rodada</span>
+                  <strong>{op.value}</strong>
+                </div>
+                <div className="metric-box">
+                  <span>Data Limite</span>
+                  <strong>{op.date}</strong>
+                </div>
+              </div>
+
+              <div className="card-footer-action">
+                <Link to="/buscar" className="btn btn-card-action">
+                  Ver detalhes da rodada →
+                </Link>
+              </div>
             </article>
           ))}
         </div>
       </section>
-    </>
-  )
-}
 
-function LoginPage({ setActiveRole }: { setActiveRole: (role: UserRole) => void }) {
-  const [loginRole, setLoginRole] = useState<UserRole>('startup')
-
-  return (
-    <section className="auth-shell">
-      <div className="auth-card">
-        <div className="auth-brand">
-          <img src="/logo.png" alt="Nexo logo" className="brand-logo large" />
-          <span className="brand-name">Nexo</span>
-        </div>
-
-        <h2>Entrar na plataforma</h2>
-
-        <div className="field-group">
-          <label htmlFor="email">E-mail</label>
-          <input id="email" type="email" placeholder="seu@email.com" />
-        </div>
-
-        <div className="field-group">
-          <label htmlFor="password">Senha</label>
-          <input id="password" type="password" placeholder="••••••••" />
-        </div>
-
-        <div className="inline-row">
-          <label className="checkbox-row">
-            <input type="checkbox" defaultChecked />
-            Lembrar de mim
-          </label>
-          <button type="button" className="text-link">Esqueci minha senha</button>
-        </div>
-
-        <div className="choice-row">
-          <button type="button" className={loginRole === 'startup' ? 'choice-option active' : 'choice-option'} onClick={() => setLoginRole('startup')}>
-            Startup
-          </button>
-          <button type="button" className={loginRole === 'investor' ? 'choice-option active' : 'choice-option'} onClick={() => setLoginRole('investor')}>
-            Investidor
-          </button>
-        </div>
-
-        <button type="button" className="btn btn-primary full" onClick={() => setActiveRole(loginRole)}>
-          Entrar como {loginRole === 'startup' ? 'Startup' : 'Investidor'}
-        </button>
-
-        <p className="muted-text">
-          Ainda não tem conta? <Link to="/signup" className="text-link">Cadastre-se</Link>
-        </p>
-      </div>
-    </section>
-  )
-}
-
-function SignupPage({ setActiveRole }: { setActiveRole: (role: UserRole) => void }) {
-  const [signupMode, setSignupMode] = useState<UserRole>('startup')
-
-  return (
-    <section className="auth-shell">
-      <div className="auth-card">
-        <div className="auth-brand center">
-          <img src="/logo.png" alt="Nexo logo" className="brand-logo large" />
-          <span className="brand-name">Nexo</span>
-        </div>
-
-        <h2>Comece a sua jornada</h2>
-
-        <div className="choice-row">
-          <button type="button" className={signupMode === 'startup' ? 'choice-option active' : 'choice-option'} onClick={() => setSignupMode('startup')}>
-            Sou uma Startup
-          </button>
-          <button type="button" className={signupMode === 'investor' ? 'choice-option active' : 'choice-option'} onClick={() => setSignupMode('investor')}>
-            Sou Investidor
-          </button>
-        </div>
-
-        {signupMode === 'startup' ? (
-          <>
-            <div className="field-grid two-col">
-              <div className="field-group">
-                <label htmlFor="startup-name">Nome da startup</label>
-                <input id="startup-name" placeholder="NovaFlow" />
-              </div>
-              <div className="field-group">
-                <label htmlFor="segment">Segmento</label>
-                <input id="segment" placeholder="Logística IA" />
-              </div>
+      {/* FINAL HIGH-CONVERSION CTA BANNER */}
+      <section className="cta-banner-section">
+        <div className="cta-banner-card">
+          <div className="cta-banner-glow" />
+          <div className="cta-banner-content">
+            <h2>Pronto para acelerar sua próxima conexão de sucesso?</h2>
+            <p>Junte-se a mais de 1.200 startups e 320 investidores que já utilizam a Nexo para estruturar rodadas com transparência e eficiência.</p>
+            <div className="cta-banner-buttons">
+              <Link to="/signup" className="btn btn-primary btn-glow btn-lg">
+                Criar conta gratuita
+              </Link>
+              <Link to="/buscar" className="btn btn-glass btn-lg">
+                Explorar ecossistema
+              </Link>
             </div>
-
-            <div className="field-group">
-              <label htmlFor="startup-desc">Descrição</label>
-              <textarea id="startup-desc" rows={4} placeholder="Descreva sua proposta de valor e trajetória." />
-            </div>
-
-            <div className="field-grid two-col">
-              <div className="field-group">
-                <label htmlFor="stage">Estágio</label>
-                <select id="stage" defaultValue="Seed">
-                  <option>Pré-semente</option>
-                  <option>Seed</option>
-                  <option>Série A</option>
-                  <option>Expansion</option>
-                </select>
-              </div>
-              <div className="field-group">
-                <label htmlFor="ticket">Investimento pretendido</label>
-                <input id="ticket" placeholder="R$ 750k" />
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="field-grid two-col">
-              <div className="field-group">
-                <label htmlFor="investor-name">Nome</label>
-                <input id="investor-name" placeholder="Helena Costa" />
-              </div>
-              <div className="field-group">
-                <label htmlFor="investor-type">Tipo</label>
-                <select id="investor-type" defaultValue="Anjo">
-                  <option>Anjo</option>
-                  <option>Fundo</option>
-                  <option>Family Office</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="field-group">
-              <label htmlFor="areas">Áreas de interesse</label>
-              <input id="areas" placeholder="IA, Saúde, B2B" />
-            </div>
-
-            <div className="field-grid two-col">
-              <div className="field-group">
-                <label htmlFor="focus">Faixa de investimento</label>
-                <input id="focus" placeholder="R$ 300k - R$ 1M" />
-              </div>
-              <div className="field-group">
-                <label htmlFor="city">Localização</label>
-                <input id="city" placeholder="Belo Horizonte" />
-              </div>
-            </div>
-          </>
-        )}
-
-        <button type="button" className="btn btn-primary full" onClick={() => setActiveRole(signupMode)}>
-          Criar conta como {signupMode === 'startup' ? 'Startup' : 'Investidor'}
-        </button>
-      </div>
-    </section>
+          </div>
+        </div>
+      </section>
+    </div>
   )
 }
 
@@ -558,18 +724,18 @@ function DashboardPage({ activeRole }: { activeRole: UserRole }) {
   const dashboardStats =
     activeRole === 'startup'
       ? [
-          ['Perfil completo', '87%'],
-          ['Visualizações', '1.3k'],
-          ['Investidores interessados', '24'],
-          ['Matches', '8'],
-          ['Oportunidades', '16'],
+          ['Perfil Completo', '87%', '+12% este mês'],
+          ['Visualizações do Perfil', '1.3k', '+28% na semana'],
+          ['Investidores Interessados', '24', '3 novos hoje'],
+          ['Matches Compatíveis', '8', '94% fit médio'],
+          ['Rodadas Relacionadas', '16', 'Ativas'],
         ]
       : [
-          ['Startups visualizadas', '42'],
-          ['Matches', '11'],
-          ['Interesses enviados', '9'],
-          ['Novas oportunidades', '7'],
-          ['Compatibilidade média', '91%'],
+          ['Startups Visualizadas', '42', 'Nesta semana'],
+          ['Matches de Alta Tese', '11', 'Score > 90%'],
+          ['Interesses Enviados', '9', '2 respostas'],
+          ['Novas Oportunidades', '7', 'Últimos 7 dias'],
+          ['Compatibilidade Média', '91%', 'Filtros ativos'],
         ]
 
   const recommendations = activeRole === 'startup' ? investors : startups
@@ -578,42 +744,120 @@ function DashboardPage({ activeRole }: { activeRole: UserRole }) {
     <section className="dashboard-shell">
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <img src="/logo.png" alt="Nexo logo" className="brand-logo small" />
+          <div className="brand-logo-wrap small">
+            <img src="/logo.png" alt="Nexo logo" className="brand-logo small" />
+          </div>
           <span className="brand-name">Nexo</span>
+        </div>
+
+        <div className="sidebar-user-pill">
+          <div className="user-avatar-dot" />
+          <div>
+            <strong>{activeRole === 'startup' ? 'Startup Modo' : 'Investidor Modo'}</strong>
+            <span>Conta Verificada</span>
+          </div>
         </div>
 
         <nav className="sidebar-nav" aria-label="Menu do dashboard">
           {[
-            { label: 'Dashboard', to: '/dashboard' },
-            { label: 'Buscar', to: '/buscar' },
-            { label: 'Oportunidades', to: '/oportunidades' },
-            { label: 'Matches', to: '/matches' },
-            { label: 'Interesses', to: '/interesses' },
-            { label: 'Configurações', to: '/configuracoes' },
+            {
+              label: 'Dashboard',
+              to: '/dashboard',
+              icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+              ),
+            },
+            {
+              label: 'Buscar Ecossistema',
+              to: '/buscar',
+              icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              ),
+            },
+            {
+              label: 'Oportunidades',
+              to: '/oportunidades',
+              icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+              ),
+            },
+            {
+              label: 'Matches',
+              to: '/matches',
+              icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+              ),
+            },
+            {
+              label: 'Interesses',
+              to: '/interesses',
+              icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+              ),
+            },
+            {
+              label: 'Configurações',
+              to: '/configuracoes',
+              icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+              ),
+            },
           ].map((item) => (
-            <NavLink key={item.label} to={item.to} className={({ isActive }) => (isActive ? 'side-link active' : 'side-link')}>
-              {item.label}
+            <NavLink
+              key={item.label}
+              to={item.to}
+              className={({ isActive }) => (isActive ? 'side-link active' : 'side-link')}
+            >
+              <span className="side-link-icon">{item.icon}</span>
+              <span>{item.label}</span>
             </NavLink>
           ))}
         </nav>
+
+        <div className="sidebar-footer">
+          <Link to="/" className="btn btn-sidebar-logout">
+            <span>Voltar ao Início</span>
+          </Link>
+        </div>
       </aside>
 
       <div className="dashboard-main">
         <header className="dashboard-header">
           <div>
-            <p className="label">{activeRole === 'startup' ? 'Dashboard da Startup' : 'Dashboard do Investidor'}</p>
-            <h2>{activeRole === 'startup' ? 'Resumo executivo' : 'Startups e combinações'}</h2>
+            <div className="eyebrow-badge small">
+              <span className="pulse-dot" />
+              <span>{activeRole === 'startup' ? 'Painel da Startup' : 'Painel do Investidor'}</span>
+            </div>
+            <h2>{activeRole === 'startup' ? 'Resumo Executivo & Conexões' : 'Pipeline de Startups & Oportunidades'}</h2>
           </div>
           <Link to="/buscar" className="btn btn-primary">
-            {activeRole === 'startup' ? 'Explorar investidores' : 'Encontrar startups'}
+            {activeRole === 'startup' ? 'Explorar Investidores →' : 'Explorar Startups →'}
           </Link>
         </header>
 
         <div className="stats-grid">
-          {dashboardStats.map(([label, value]) => (
+          {dashboardStats.map(([label, value, sub]) => (
             <div key={label} className="stat-card">
-              <span>{label}</span>
-              <strong>{value}</strong>
+              <span className="stat-label">{label}</span>
+              <strong className="stat-value">{value}</strong>
+              <span className="stat-subtext">{sub}</span>
             </div>
           ))}
         </div>
@@ -621,60 +865,83 @@ function DashboardPage({ activeRole }: { activeRole: UserRole }) {
         <div className="content-grid">
           <div className="panel">
             <div className="panel-header">
-              <h3>{activeRole === 'startup' ? 'Investidores recomendados' : 'Startups recomendadas'}</h3>
-              <Link to="/buscar" className="text-link">Ver todos</Link>
+              <div>
+                <h3>{activeRole === 'startup' ? 'Investidores Recomendados' : 'Startups Recomendadas'}</h3>
+                <p className="panel-subtitle">Baseado no seu perfil de tração e tese de mercado</p>
+              </div>
+              <Link to="/buscar" className="text-link">Ver todos ({recommendations.length})</Link>
             </div>
 
-            {recommendations.map((item) => {
-              if (activeRole === 'startup') {
-                const investor = item as Investor
+            <div className="recommendations-list">
+              {recommendations.map((item) => {
+                if (activeRole === 'startup') {
+                  const investor = item as Investor
+
+                  return (
+                    <div key={investor.id} className="recommendation-card">
+                      <div className="avatar investor-avatar">
+                        {investor.name.split(' ').map((part) => part[0]).slice(0, 2).join('')}
+                      </div>
+                      <div className="recommendation-copy">
+                        <h4>{investor.name}</h4>
+                        <p>{investor.type} • {investor.city}</p>
+                        <div className="tag-row">
+                          {investor.focus.map((focus) => (
+                            <span key={focus} className="pill lite">{focus}</span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="recommendation-meta">
+                        <span className="match-badge">
+                          <span className="badge-dot" />
+                          {investor.match}% Fit
+                        </span>
+                        <span className="ticket-label">{investor.ticket}</span>
+                        <Link to={`/perfil/investor/${investor.id}`} className="btn btn-secondary small">
+                          Ver perfil
+                        </Link>
+                      </div>
+                    </div>
+                  )
+                }
+
+                const startup = item as Startup
 
                 return (
-                  <div key={investor.id} className="recommendation-card">
-                    <div className="avatar">{investor.name.split(' ').map((part) => part[0]).slice(0, 2).join('')}</div>
+                  <div key={startup.id} className="recommendation-card">
+                    <div className="avatar startup-avatar">
+                      {startup.name.slice(0, 2).toUpperCase()}
+                    </div>
                     <div className="recommendation-copy">
-                      <h4>{investor.name}</h4>
-                      <p>{investor.type} • {investor.city}</p>
+                      <h4>{startup.name}</h4>
+                      <p>{startup.sector} • {startup.city}</p>
                       <div className="tag-row">
-                        {investor.focus.map((focus) => (
-                          <span key={focus} className="pill lite">{focus}</span>
-                        ))}
+                        <span className="pill lite">{startup.stage}</span>
+                        <span className="pill">{startup.model}</span>
                       </div>
                     </div>
                     <div className="recommendation-meta">
-                      <strong>{investor.match}%</strong>
-                      <span>{investor.ticket}</span>
-                      <Link to={`/perfil/investor/${investor.id}`} className="btn btn-secondary small">Ver perfil</Link>
+                      <span className="match-badge">
+                        <span className="badge-dot" />
+                        {startup.match}% Fit
+                      </span>
+                      <span className="ticket-label">{startup.investment}</span>
+                      <Link to={`/perfil/startup/${startup.id}`} className="btn btn-secondary small">
+                        Ver perfil
+                      </Link>
                     </div>
                   </div>
                 )
-              }
-
-              const startup = item as Startup
-
-              return (
-                <div key={startup.id} className="recommendation-card">
-                  <div className="avatar">{startup.name.slice(0, 2).toUpperCase()}</div>
-                  <div className="recommendation-copy">
-                    <h4>{startup.name}</h4>
-                    <p>{startup.sector} • {startup.city}</p>
-                    <div className="tag-row">
-                      <span className="pill lite">{startup.stage}</span>
-                    </div>
-                  </div>
-                  <div className="recommendation-meta">
-                    <strong>{startup.match}%</strong>
-                    <span>{startup.investment}</span>
-                    <Link to={`/perfil/startup/${startup.id}`} className="btn btn-secondary small">Ver perfil</Link>
-                  </div>
-                </div>
-              )
-            })}
+              })}
+            </div>
           </div>
 
           <div className="panel">
             <div className="panel-header">
-              <h3>{activeRole === 'startup' ? 'Oportunidades relacionadas' : 'Áreas de interesse'}</h3>
+              <div>
+                <h3>{activeRole === 'startup' ? 'Rodadas Relacionadas' : 'Teses em Alta'}</h3>
+                <p className="panel-subtitle">Oportunidades em seu radar</p>
+              </div>
             </div>
             <div className="mini-list">
               {activeRole === 'startup'
@@ -682,18 +949,18 @@ function DashboardPage({ activeRole }: { activeRole: UserRole }) {
                     <div key={opp.id} className="mini-item">
                       <div>
                         <strong>{opp.name}</strong>
-                        <span>{opp.sector}</span>
+                        <span>{opp.sector} • {opp.value}</span>
                       </div>
                       <span className="mini-badge">{opp.match}%</span>
                     </div>
                   ))
-                : ['IA', 'Saúde', 'Logística', 'Energia', 'B2B'].map((area) => (
+                : ['Inteligência Artificial', 'Saúde & BioTech', 'Logística Autônoma', 'Clean Energy', 'Fintech B2B'].map((area) => (
                     <div key={area} className="mini-item">
                       <div>
                         <strong>{area}</strong>
-                        <span>Prioridade de investimento</span>
+                        <span>Prioridade de alocação de fundos</span>
                       </div>
-                      <span className="mini-badge">92%</span>
+                      <span className="mini-badge">94%</span>
                     </div>
                   ))}
             </div>
@@ -711,44 +978,52 @@ function SearchPage({ activeRole }: { activeRole: UserRole }) {
     <section className="search-shell">
       <div className="search-topbar">
         <div>
-          <p className="label">Busca</p>
-          <h2>{activeRole === 'startup' ? 'Encontre investidores com potencial' : 'Descubra startups compatíveis'}</h2>
+          <span className="label-badge">Radar do Ecossistema</span>
+          <h2>{activeRole === 'startup' ? 'Encontre Investidores Compatíveis' : 'Descubra Startups Promissoras'}</h2>
+          <p className="section-desc">Filtre por estágio, segmento de atuação, localização e faixa de capital.</p>
         </div>
         <div className="search-controls">
-          <input type="text" placeholder={activeRole === 'startup' ? 'Pesquisar investidor ou área' : 'Pesquisar startup ou setor'} />
+          <div className="search-input-wrapper">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" placeholder={activeRole === 'startup' ? 'Pesquisar por nome de investidor, fundo ou tese...' : 'Pesquisar por startup, modelo de negócio ou setor...'} />
+          </div>
           <button type="button" className="btn btn-primary">Buscar</button>
         </div>
       </div>
 
       <div className="filters-panel">
         <div className="filter-group">
-          <label>{activeRole === 'startup' ? 'Área de interesse' : 'Segmento'}</label>
+          <label>{activeRole === 'startup' ? 'Tese / Segmento' : 'Setor de Atuação'}</label>
           <select defaultValue="Todos">
-            <option>Todos</option>
-            <option>{activeRole === 'startup' ? 'IA' : 'Logística IA'}</option>
-            <option>{activeRole === 'startup' ? 'Saúde' : 'Saúde digital'}</option>
-            <option>{activeRole === 'startup' ? 'Fintech' : 'Energia limpa'}</option>
+            <option>Todos os setores</option>
+            <option>{activeRole === 'startup' ? 'Inteligência Artificial' : 'Logística IA'}</option>
+            <option>{activeRole === 'startup' ? 'Saúde Digital' : 'Saúde Digital'}</option>
+            <option>{activeRole === 'startup' ? 'Fintech & B2B' : 'Energia Limpa'}</option>
           </select>
         </div>
         <div className="filter-group">
-          <label>Localização</label>
+          <label>Localização / Hub</label>
           <select defaultValue="Brasil">
-            <option>Brasil</option>
-            <option>São Paulo</option>
-            <option>Rio de Janeiro</option>
-            <option>Belo Horizonte</option>
+            <option>Todo o Brasil</option>
+            <option>São Paulo - SP</option>
+            <option>Rio de Janeiro - RJ</option>
+            <option>Belo Horizonte - MG</option>
+            <option>Curitiba - PR</option>
           </select>
         </div>
         <div className="filter-group">
-          <label>{activeRole === 'startup' ? 'Faixa de investimento' : 'Estágio'}</label>
+          <label>{activeRole === 'startup' ? 'Faixa de Aporte' : 'Estágio Atual'}</label>
           <select defaultValue="Qualquer">
-            <option>Qualquer</option>
+            <option>Qualquer faixa / estágio</option>
             <option>{activeRole === 'startup' ? 'R$ 300k - R$ 1M' : 'Pré-semente'}</option>
             <option>{activeRole === 'startup' ? 'R$ 1M - R$ 5M' : 'Seed'}</option>
             <option>{activeRole === 'startup' ? 'Acima de R$ 5M' : 'Série A'}</option>
           </select>
         </div>
-        <button type="button" className="btn btn-secondary">Limpar filtros</button>
+        <button type="button" className="btn btn-secondary btn-reset-filters">Limpar filtros</button>
       </div>
 
       <div className="listing-grid">
@@ -760,16 +1035,21 @@ function SearchPage({ activeRole }: { activeRole: UserRole }) {
               <article key={investor.id} className="listing-card">
                 <div className="card-topline">
                   <span className="pill">{investor.type}</span>
-                  <span className="match-badge">{investor.match}%</span>
+                  <span className="match-badge">
+                    <span className="badge-dot" />
+                    {investor.match}% Match
+                  </span>
                 </div>
                 <h3>{investor.name}</h3>
-                <p>{investor.focus.join(', ')} • {investor.city}</p>
-                <ul>
-                  <li>{investor.city}</li>
-                  <li>{investor.ticket}</li>
-                  <li>{investor.focus[0]}</li>
-                </ul>
-                <Link to={`/perfil/investor/${investor.id}`} className="btn btn-secondary small">Ver investidor</Link>
+                <p className="listing-desc">{investor.thesis}</p>
+                <div className="listing-meta-tags">
+                  <span className="meta-tag">📍 {investor.city}</span>
+                  <span className="meta-tag">💰 {investor.ticket}</span>
+                  <span className="meta-tag">🎯 {investor.focus[0]}</span>
+                </div>
+                <Link to={`/perfil/investor/${investor.id}`} className="btn btn-secondary full">
+                  Ver perfil completo →
+                </Link>
               </article>
             )
           }
@@ -780,16 +1060,21 @@ function SearchPage({ activeRole }: { activeRole: UserRole }) {
             <article key={startup.id} className="listing-card">
               <div className="card-topline">
                 <span className="pill">{startup.sector}</span>
-                <span className="match-badge">{startup.match}%</span>
+                <span className="match-badge">
+                  <span className="badge-dot" />
+                  {startup.match}% Match
+                </span>
               </div>
               <h3>{startup.name}</h3>
-              <p>{startup.description}</p>
-              <ul>
-                <li>{startup.city}</li>
-                <li>{startup.stage}</li>
-                <li>{startup.investment}</li>
-              </ul>
-              <Link to={`/perfil/startup/${startup.id}`} className="btn btn-secondary small">Ver startup</Link>
+              <p className="listing-desc">{startup.description}</p>
+              <div className="listing-meta-tags">
+                <span className="meta-tag">📍 {startup.city}</span>
+                <span className="meta-tag">🚀 {startup.stage}</span>
+                <span className="meta-tag">💼 {startup.investment}</span>
+              </div>
+              <Link to={`/perfil/startup/${startup.id}`} className="btn btn-secondary full">
+                Ver startup completa →
+              </Link>
             </article>
           )
         })}
@@ -803,8 +1088,9 @@ function OpportunitiesPage() {
     <section className="screen-shell">
       <div className="section-header compact">
         <div>
-          <p className="label">Oportunidades</p>
-          <h2>Investimentos e programas em destaque</h2>
+          <span className="label-badge">Rodadas Abertas</span>
+          <h2>Oportunidades de Investimento e Aceleração</h2>
+          <p className="section-desc">Participe de rodadas verificadas com due diligence simplificada.</p>
         </div>
       </div>
 
@@ -813,15 +1099,22 @@ function OpportunitiesPage() {
           <article key={item.id} className="opportunity-full-card">
             <div className="card-topline">
               <span className="pill">{item.type}</span>
-              <span className="match-badge">{item.match}%</span>
+              <span className="match-badge">
+                <span className="badge-dot" />
+                {item.match}% Match
+              </span>
             </div>
             <h3>{item.name}</h3>
-            <p>{item.description}</p>
+            <p className="full-card-desc">{item.description}</p>
             <div className="meta-grid">
               <div><span>Setor</span><strong>{item.sector}</strong></div>
               <div><span>Localização</span><strong>{item.location}</strong></div>
-              <div><span>Valor</span><strong>{item.value}</strong></div>
-              <div><span>Status</span><strong>{item.status}</strong></div>
+              <div><span>Valor Alvo</span><strong>{item.value}</strong></div>
+              <div><span>Status</span><strong className="status-highlight">{item.status}</strong></div>
+            </div>
+            <div className="full-card-actions">
+              <button type="button" className="btn btn-primary">Demonstrar Interesse</button>
+              <button type="button" className="btn btn-secondary">Baixar Teaser Executivo</button>
             </div>
           </article>
         ))}
@@ -835,8 +1128,9 @@ function MatchesPage() {
     <section className="screen-shell">
       <div className="section-header compact">
         <div>
-          <p className="label">Matches</p>
-          <h2>Suas melhores combinações</h2>
+          <span className="label-badge">Algoritmo de Afinidade</span>
+          <h2>Suas Melhores Combinações</h2>
+          <p className="section-desc">Entenda detalhadamente os critérios que geraram as notas de compatibilidade.</p>
         </div>
       </div>
 
@@ -844,21 +1138,27 @@ function MatchesPage() {
         {matchCards.map((match) => (
           <article key={match.id} className="match-card">
             <div className="card-topline">
-              <span className="pill">{match.type}</span>
-              <span className="match-badge">{match.match}%</span>
+              <span className="pill">{match.type === 'startup' ? 'Startup' : 'Investidor'}</span>
+              <span className="match-badge">
+                <span className="badge-dot" />
+                {match.match}% Match
+              </span>
             </div>
             <h3>{match.name}</h3>
             <div className="match-breakdown">
               {match.reasons.map((reason) => (
                 <div key={reason.label} className="match-row">
-                  <span>{reason.label}</span>
+                  <span className="match-label">{reason.label}</span>
                   <div className="progress-bar">
                     <span style={{ width: `${reason.value}%` }} />
                   </div>
-                  <strong>{reason.value}%</strong>
+                  <strong className="match-val">{reason.value}%</strong>
                 </div>
               ))}
             </div>
+            <button type="button" className="btn btn-primary full btn-match-connect">
+              Iniciar Conexão
+            </button>
           </article>
         ))}
       </div>
@@ -871,48 +1171,55 @@ function InterestsPage() {
     <section className="screen-shell">
       <div className="section-header compact">
         <div>
-          <p className="label">Interesses</p>
-          <h2>Conexões e respostas</h2>
+          <span className="label-badge">Central de Relacionamento</span>
+          <h2>Interesses e Conexões</h2>
+          <p className="section-desc">Acompanhe o status de solicitações de contato enviadas e recebidas.</p>
         </div>
       </div>
 
       <div className="interest-layout">
         <div className="panel">
-          <h3>Interesses enviados</h3>
+          <div className="panel-header">
+            <h3>Interesses Enviados</h3>
+            <span className="badge-counter">2 ativos</span>
+          </div>
           <div className="mini-list">
             <div className="mini-item">
               <div>
                 <strong>NovaFlow</strong>
-                <span>Logística IA</span>
+                <span>Logística IA • Rodada Série A</span>
               </div>
-              <span className="mini-badge">Pendente</span>
+              <span className="status-pill pending">Pendente</span>
             </div>
             <div className="mini-item">
               <div>
                 <strong>GreenGrid</strong>
-                <span>Energia limpa</span>
+                <span>Energia Limpa • Seed</span>
               </div>
-              <span className="mini-badge">Aceito</span>
+              <span className="status-pill accepted">Aceito</span>
             </div>
           </div>
         </div>
 
         <div className="panel">
-          <h3>Interesses recebidos</h3>
+          <div className="panel-header">
+            <h3>Interesses Recebidos</h3>
+            <span className="badge-counter">2 novos</span>
+          </div>
           <div className="mini-list">
             <div className="mini-item">
               <div>
                 <strong>Atlas Ventures</strong>
-                <span>Fundo</span>
+                <span>Fundo de VC • São Paulo</span>
               </div>
-              <span className="mini-badge">Novo</span>
+              <span className="status-pill new">Novo</span>
             </div>
             <div className="mini-item">
               <div>
                 <strong>Helena Costa</strong>
-                <span>Anjo</span>
+                <span>Investidora Anjo • Belo Horizonte</span>
               </div>
-              <span className="mini-badge">Respondido</span>
+              <span className="status-pill replied">Respondido</span>
             </div>
           </div>
         </div>
@@ -931,7 +1238,15 @@ function ProfilePage({ activeRole }: { activeRole: UserRole }) {
       : investors.find((item) => item.id === profileId)
 
   if (!profile) {
-    return <section className="screen-shell"><h2>Perfil não encontrado</h2></section>
+    return (
+      <section className="screen-shell">
+        <div className="not-found-card">
+          <h2>Perfil não encontrado</h2>
+          <p>O perfil que você tentou acessar não existe ou foi removido.</p>
+          <Link to="/buscar" className="btn btn-primary">Voltar para busca</Link>
+        </div>
+      </section>
+    )
   }
 
   if (type === 'startup') {
@@ -940,53 +1255,61 @@ function ProfilePage({ activeRole }: { activeRole: UserRole }) {
     return (
       <section className="profile-shell">
         <div className="profile-hero">
-          <div className="profile-avatar">{startup.name.slice(0, 2).toUpperCase()}</div>
-          <div>
-            <p className="label">Perfil da startup</p>
+          <div className="profile-avatar startup-avatar">
+            {startup.name.slice(0, 2).toUpperCase()}
+          </div>
+          <div className="profile-hero-info">
+            <span className="label-badge">Perfil da Startup</span>
             <h2>{startup.name}</h2>
-            <p>{startup.sector} • {startup.city}</p>
+            <p className="profile-sub">{startup.sector} • {startup.city}</p>
           </div>
           <div className="match-score">
-            <span>Compatibilidade</span>
+            <span>Score de Afinidade</span>
             <strong>{startup.match}%</strong>
           </div>
         </div>
 
         <div className="profile-layout">
           <div className="panel profile-main">
-            <h3>Sobre a empresa</h3>
-            <p>{startup.description}</p>
+            <h3>Sobre a Empresa</h3>
+            <p className="profile-description-text">{startup.description}</p>
 
             <div className="meta-grid">
               <div><span>Estágio</span><strong>{startup.stage}</strong></div>
               <div><span>Modelo</span><strong>{startup.model}</strong></div>
               <div><span>Equipe</span><strong>{startup.team}</strong></div>
-              <div><span>Investimento</span><strong>{startup.investment}</strong></div>
+              <div><span>Investimento Alvo</span><strong>{startup.investment}</strong></div>
             </div>
 
             <div className="match-breakdown">
-              <h4>Compatibilidade</h4>
+              <h4>Detalhamento de Compatibilidade</h4>
               {matches.map((item) => (
                 <div key={item.label} className="match-row">
-                  <span>{item.label}</span>
+                  <span className="match-label">{item.label}</span>
                   <div className="progress-bar">
                     <span style={{ width: `${item.value}%` }} />
                   </div>
-                  <strong>{item.value}%</strong>
+                  <strong className="match-val">{item.value}%</strong>
                 </div>
               ))}
             </div>
           </div>
 
           <div className="panel profile-side">
-            <h3>{activeRole === 'startup' ? 'Oportunidade' : 'Conclusão'}</h3>
+            <h3>{activeRole === 'startup' ? 'Oportunidade de Conexão' : 'Parecer de Alinhamento'}</h3>
             <p>
               {activeRole === 'startup'
-                ? 'Alinhamento forte com investidores que buscam operações escaláveis e impacto em logística e tecnologia.'
-                : 'A startup combina com investidores focados em eficiência, automação e crescimento regional.'}
+                ? 'Alinhamento forte com investidores focados em escala operacional acelerada e automação B2B.'
+                : 'A startup apresenta métricas de tração consistentes e modelo escalável para rodadas de crescimento regional.'}
             </p>
-            <button type="button" className="btn btn-primary full">{activeRole === 'startup' ? 'Demonstrar interesse' : 'Tenho interesse'}</button>
-            <Link to="/buscar" className="btn btn-secondary full">Ver mais</Link>
+            <div className="profile-side-actions">
+              <button type="button" className="btn btn-primary full">
+                {activeRole === 'startup' ? 'Demonstrar Interesse' : 'Quero Investir'}
+              </button>
+              <Link to="/buscar" className="btn btn-secondary full">
+                Voltar à busca
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -998,49 +1321,57 @@ function ProfilePage({ activeRole }: { activeRole: UserRole }) {
   return (
     <section className="profile-shell">
       <div className="profile-hero">
-        <div className="profile-avatar">{investor.name.slice(0, 2).toUpperCase()}</div>
-        <div>
-          <p className="label">Perfil do investidor</p>
+        <div className="profile-avatar investor-avatar">
+          {investor.name.split(' ').map((part) => part[0]).slice(0, 2).join('')}
+        </div>
+        <div className="profile-hero-info">
+          <span className="label-badge">Perfil do Investidor</span>
           <h2>{investor.name}</h2>
-          <p>{investor.type} • {investor.city}</p>
+          <p className="profile-sub">{investor.type} • {investor.city}</p>
         </div>
         <div className="match-score">
-          <span>Compatibilidade</span>
+          <span>Score de Afinidade</span>
           <strong>{investor.match}%</strong>
         </div>
       </div>
 
       <div className="profile-layout">
         <div className="panel profile-main">
-          <h3>Sobre o investidor</h3>
-          <p>{investor.description}</p>
+          <h3>Sobre o Investidor</h3>
+          <p className="profile-description-text">{investor.description}</p>
 
           <div className="meta-grid">
             <div><span>Tipo</span><strong>{investor.type}</strong></div>
-            <div><span>Faixa</span><strong>{investor.ticket}</strong></div>
-            <div><span>Áreas</span><strong>{investor.focus.join(', ')}</strong></div>
+            <div><span>Faixa de Ticket</span><strong>{investor.ticket}</strong></div>
+            <div><span>Áreas de Interesse</span><strong>{investor.focus.join(', ')}</strong></div>
             <div><span>Localização</span><strong>{investor.city}</strong></div>
           </div>
 
           <div className="match-breakdown">
-            <h4>Compatibilidade</h4>
+            <h4>Detalhamento de Compatibilidade</h4>
             {matches.map((item) => (
               <div key={item.label} className="match-row">
-                <span>{item.label}</span>
+                <span className="match-label">{item.label}</span>
                 <div className="progress-bar">
                   <span style={{ width: `${item.value}%` }} />
                 </div>
-                <strong>{item.value}%</strong>
+                <strong className="match-val">{item.value}%</strong>
               </div>
             ))}
           </div>
         </div>
 
         <div className="panel profile-side">
-          <h3>Resumo da tese</h3>
+          <h3>Resumo da Tese</h3>
           <p>{investor.thesis}</p>
-          <button type="button" className="btn btn-primary full">{activeRole === 'startup' ? 'Demonstrar interesse' : 'Tenho interesse'}</button>
-          <Link to="/buscar" className="btn btn-secondary full">Ver mais</Link>
+          <div className="profile-side-actions">
+            <button type="button" className="btn btn-primary full">
+              {activeRole === 'startup' ? 'Enviar Pitch Deck' : 'Conectar com Investidor'}
+            </button>
+            <Link to="/buscar" className="btn btn-secondary full">
+              Voltar à busca
+            </Link>
+          </div>
         </div>
       </div>
     </section>
@@ -1052,38 +1383,42 @@ function SettingsPage() {
     <section className="screen-shell">
       <div className="section-header compact">
         <div>
-          <p className="label">Configurações</p>
-          <h2>Preferências e conta</h2>
+          <span className="label-badge">Painel de Controle</span>
+          <h2>Configurações e Preferências</h2>
+          <p className="section-desc">Gerencie seus dados de acesso, privacidade e notificações.</p>
         </div>
       </div>
 
       <div className="settings-grid">
         <div className="panel">
-          <h3>Dados pessoais</h3>
+          <h3>Dados Cadastrais</h3>
           <div className="field-group">
-            <label>Email</label>
-            <input defaultValue="contato@nexo.app" />
+            <label htmlFor="settings-email">E-mail Principal</label>
+            <input id="settings-email" defaultValue="contato@nexo.app" />
           </div>
           <div className="field-group">
-            <label>Localização</label>
-            <input defaultValue="São Paulo - SP" />
+            <label htmlFor="settings-loc">Localização / Hub Principal</label>
+            <input id="settings-loc" defaultValue="São Paulo - SP" />
           </div>
+          <button type="button" className="btn btn-primary" style={{ marginTop: '1.25rem' }}>Salvar Alterações</button>
         </div>
 
         <div className="panel">
-          <h3>Privacidade</h3>
-          <label className="checkbox-row">
-            <input type="checkbox" defaultChecked />
-            Permitir contato por e-mail
-          </label>
-          <label className="checkbox-row">
-            <input type="checkbox" defaultChecked />
-            Mostrar perfil em buscas
-          </label>
-          <label className="checkbox-row">
-            <input type="checkbox" />
-            Receber sugestões automáticas
-          </label>
+          <h3>Privacidade & Segurança</h3>
+          <div className="checkbox-stack">
+            <label className="checkbox-row">
+              <input type="checkbox" defaultChecked />
+              <span>Permitir contato direto por e-mail de perfis compatíveis</span>
+            </label>
+            <label className="checkbox-row">
+              <input type="checkbox" defaultChecked />
+              <span>Exibir perfil nos resultados de busca pública</span>
+            </label>
+            <label className="checkbox-row">
+              <input type="checkbox" defaultChecked />
+              <span>Receber alertas inteligentes de novos matches semanalmente</span>
+            </label>
+          </div>
         </div>
       </div>
     </section>
@@ -1095,18 +1430,27 @@ function PrivacyPage() {
     <section className="screen-shell">
       <div className="section-header compact">
         <div>
-          <p className="label">Privacidade</p>
-          <h2>Termos, LGPD e consentimento</h2>
+          <span className="label-badge">Termos Legais</span>
+          <h2>Privacidade, Termos & LGPD</h2>
+          <p className="section-desc">Transparência total no tratamento de dados e segurança de informações.</p>
         </div>
       </div>
 
       <div className="privacy-card">
-        <h3>Consentimento</h3>
-        <p>Ao utilizar a plataforma, você concorda com o tratamento de dados para fins de matchmaking, recomendações e comunicação interna.</p>
-        <h3>Política de privacidade</h3>
-        <p>Os dados de perfil e interesses são utilizados exclusivamente para conectar usuários com maior compatibilidade. Não compartilhamos informações com terceiros fora do escopo da plataforma.</p>
-        <h3>LGPD</h3>
-        <p>Você pode solicitar alteração, visualização ou exclusão dos dados a qualquer momento no painel de configurações.</p>
+        <h3>1. Consentimento e Tratamento de Dados</h3>
+        <p>
+          Ao utilizar a plataforma Nexo, você concorda com o processamento dos dados empresariais e de contato informados para fins exclusivos de matchmaking, geração de scores de compatibilidade e recomendações no ecossistema.
+        </p>
+        
+        <h3>2. Política de Privacidade & Confidencialidade</h3>
+        <p>
+          As informações de tração financeira e métricas confidenciais são protegidas por criptografia de ponta a ponta e apenas compartilhadas mediante autorização explícita do fundador ou investidor. Não comercializamos dados de usuários com terceiros.
+        </p>
+        
+        <h3>3. Direitos do Titular (LGPD)</h3>
+        <p>
+          Em conformidade com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018), você pode solicitar a qualquer momento a visualização, correção, anonimização ou exclusão definitiva dos seus dados através do nosso canal de privacidade ou nas configurações da conta.
+        </p>
       </div>
     </section>
   )
