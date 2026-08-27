@@ -10,12 +10,12 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Status-MVP%20em%20Desenvolvimento-blue?style=for-the-badge" alt="Status" />
-  <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React" />
-  <img src="https://img.shields.io/badge/Node.js-20.x-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Frontend-Concluído%20(React%2019)-brightgreen?style=for-the-badge&logo=react&logoColor=black" alt="Frontend" />
+  <img src="https://img.shields.io/badge/Backend%20API-Em%20Desenvolvimento-orange?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Backend" />
+  <img src="https://img.shields.io/badge/Banco%20de%20Dados-Em%20Estruturação-yellow?style=for-the-badge" alt="Banco de Dados" />
   <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Vite-6.x-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
-  <img src="https://img.shields.io/badge/LGPD-Compliant-green?style=for-the-badge" alt="LGPD" />
+  <img src="https://img.shields.io/badge/LGPD-Planejada-blue?style=for-the-badge" alt="LGPD" />
 </p>
 
 ---
@@ -24,13 +24,12 @@
 
 - [Visão Geral](#-visão-geral)
 - [Proposta de Valor e Público-Alvo](#-proposta-de-valor-e-público-alvo)
-- [Escopo da 1ª Entrega (MVP)](#-escopo-da-1ª-entrega-mvp)
+- [Status de Desenvolvimento do MVP](#-status-de-desenvolvimento-do-mvp)
 - [Fluxo Principal da Solução](#-fluxo-principal-da-solução)
 - [Arquitetura e Tecnologias](#-arquitetura-e-tecnologias)
-- [Documentação das APIs (REST)](#-documentação-das-apis-rest)
 - [Business Model Canvas Inicial](#-business-model-canvas-inicial)
 - [Governança e Conformidade LGPD](#-governança-e-conformidade-lgpd)
-- [Estrutura do Projeto](#-estrutura-do-projeto)
+- [Estrutura Atual do Repositório](#-estrutura-atual-do-repositório)
 - [Como Executar o Projeto](#-como-executar-o-projeto)
 - [Equipe](#-equipe)
 
@@ -38,98 +37,80 @@
 
 ## 💡 Visão Geral
 
-O **NEXO** é uma plataforma web responsiva e PWA desenvolvida para conectar e aproximar **startups em busca de captação e crescimento** a **investidores em busca de oportunidades alinhadas com suas teses de investimento**. 
+O **NEXO** é uma plataforma web responsiva e PWA projetada para conectar e aproximar **startups em busca de captação e crescimento** a **investidores com teses alinhadas**.
 
-Por meio de perfis estruturados, filtros avançados e algoritmos de recomendação/matchmaking inteligente, o sistema reduz o atrito e o tempo de busca no ecossistema de inovação, promovendo conexões assertivas e transparentes.
+Por meio de perfis estruturados, filtros detalhados e mecanismos de correspondência inteligente (*matchmaking*), a plataforma reduz o atrito e o tempo de busca no ecossistema de inovação, proporcionando conexões assertivas e qualificadas.
 
 ---
 
 ## 🎯 Proposta de Valor e Público-Alvo
 
 ### Proposta de Valor
-* **Para Startups:** Visibilidade qualificada para fundos e investidores anjo, métricas padronizadas de apresentação do negócio e redução de tempo na busca por captação.
-* **Para Investidores:** Curadoria e filtragem assertiva de dealflow baseada em tese de investimento, estágio de desenvolvimento, segmento e ticket médio.
+* **Para Startups:** Visibilidade qualificada para investidores-anjo e fundos, apresentação padronizada de métricas e redução do tempo de captação.
+* **Para Investidores:** Curadoria e filtragem de dealflow com base em critérios de tese, estágio de maturidade, segmento e ticket médio.
 
 ### Público-Alvo
-1. **Empreendedores & Startups:** Negócios em fases de validação, MVP, tração ou escala que buscam capital inteligente (*smart money*).
+1. **Startups & Empreendedores:** Negócios em fases de validação, MVP, tração ou escala em busca de investimento inteligente (*smart money*).
 2. **Investidores & Fundos:** Investidores-anjo, sindicatos de investimento, aceleradoras e fundos de *Venture Capital (VC)*.
 
 ---
 
-## 🚀 Escopo da 1ª Entrega (MVP)
+## 🚀 Status de Desenvolvimento do MVP (1ª Entrega)
 
-A 1ª Entrega do projeto contempla a integração completa de **Frontend, Backend, Banco de Dados e Governança**:
-
-* [x] **Aplicação Web Responsiva / PWA Funcional:** Interface moderna otimizada para múltiplos dispositivos.
-* [x] **Autenticação e Sessão:** Cadastro, login e controle de acesso com diferenciação de perfis (**Startup** vs. **Investidor**).
-* [x] **Perfil de Startups:** Cadastro detalhado contendo segmento, estágio de desenvolvimento, localização, equipe, mercado de atuação e investimento pretendido.
-* [x] **Perfil de Investidores:** Cadastro detalhado contendo áreas de interesse, tese de investimento, faixa/ticket de investimento e localização.
-* [x] **Mecanismo de Busca e Filtros:** Localização dinâmica de oportunidades por filtros categóricos e critérios de negócio.
-* [x] **Matchmaking & Registro de Interesse:** Fluxo de identificação mútua de oportunidades com registro de manifestação de interesse (*match*).
-* [x] **Dashboard Personalizado:** Painel inicial apresentando oportunidades recomendadas, métricas e conexões ativas.
-* [x] **Arquitetura Cliente-Servidor & API REST:** Comunicação estruturada, documentada e desacoplada.
-* [x] **Modelo de Governança & LGPD:** Mapeamento de dados pessoais tratados e definição preliminar das regras de uso da plataforma.
+| Módulo / Requisito | Status Atual | Detalhes |
+| :--- | :---: | :--- |
+| **Interface Web Responsiva / PWA** | `Concluído` | Interface moderna em React 19 + TypeScript rodando com Vite |
+| **Autenticação & Perfis (Startup / Investidor)** | `Concluído (UI)` | Telas e alternância de papéis implementadas no frontend |
+| **Catálogo de Startups & Investidores** | `Concluído (UI)` | Visualização de cards, métricas e teses com dados simulados |
+| **Mecanismo de Filtros & Oportunidades** | `Concluído (UI)` | Filtros dinâmicos por segmento, ticket e estágio no frontend |
+| **Fluxo de Matchmaking & Interesse** | `Concluído (UI)` | Simulação visual de registro de interesse e status de match |
+| **Dashboard de Oportunidades** | `Concluído (UI)` | Painéis e métricas renderizados no cliente |
+| **Backend REST API (Node.js)** | `Em Desenvolvimento` | Estruturação dos serviços e endpoints REST |
+| **Banco de Dados Integrado** | `Em Desenvolvimento` | Modelagem e integração do banco de dados persistente |
 
 ---
 
 ## 🔄 Fluxo Principal da Solução
 
-O fluxo central do MVP demonstra a jornada completa do usuário na plataforma:
+O fluxo da plataforma contempla toda a jornada do usuário, desde a entrada até a conexão mútua:
 
 ```mermaid
 flowchart LR
     A([Cadastro / Login]) --> B{Tipo de Perfil}
-    B -->|Startup| C[Preenchimento Perfil Startup]
-    B -->|Investidor| D[Preenchimento Tese Investidor]
+    B -->|Startup| C[Perfil da Startup & Investimento Pretendido]
+    B -->|Investidor| D[Tese de Investimento & Faixa de Aporte]
     C --> E[Busca & Descoberta]
     D --> E
     E --> F[Filtros & Recomendação]
-    F --> G[Identificação de Oportunidade]
+    F --> G[Identificação de Oportunidades]
     G --> H[Manifestação de Interesse]
     H --> I{Match Confirmado?}
     I -->|Sim| J[Acesso a Contato & Dashboard de Conexões]
-    I -->|Pendente| K[Aguardando Resposta no Dashboard]
+    I -->|Pendente| K[Acompanhamento no Dashboard]
 ```
 
 ---
 
 ## 🛠 Arquitetura e Tecnologias
 
-A solução adota uma arquitetura cliente-servidor desacoplada com comunicação via **API REST**:
+A arquitetura do projeto foi desenhada seguindo o modelo **cliente-servidor desacoplado**:
 
 ```mermaid
 graph TD
     Client["Frontend SPA / PWA (React 19 + TypeScript + Vite)"]
-    API["Backend REST API (Node.js + Express / Fastify)"]
-    DB[("Banco de Dados Relacional / NoSQL")]
-    IA["Mecanismo de Matchmaking / Filtros Inteligentes"]
+    API["Backend REST API (Node.js - Em Desenvolvimento)"]
+    DB[("Banco de Dados Integrado (Em Desenvolvimento)")]
+    IA["Módulo de Matchmaking / Filtros Inteligentes"]
 
-    Client <-->|HTTP/HTTPS - JSON / JWT| API
-    API <-->|Queries / ORM| DB
-    API <-->|Algoritmo de Correspondência| IA
+    Client <-->|HTTP / REST (JSON)| API
+    API <-->|Persistência / Queries| DB
+    API <-->|Processamento de Score| IA
 ```
 
-### Tecnologias Utilizadas
-* **Frontend:** [React](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite](https://vite.dev/), PWA, CSS Moderno / Tailwind.
-* **Backend:** [Node.js](https://nodejs.org/), Express / Fastify, RESTful Architecture.
-* **Linter & Ferramentas:** [Oxlint](https://oxc-project.github.io/), Git / GitHub.
-* **Segurança:** Autenticação via Tokens (JWT), criptografia de senhas (bcrypt).
-
----
-
-## 🔌 Documentação das APIs (REST)
-
-| Método | Endpoint | Descrição | Acesso |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/api/auth/register` | Cadastro de novos usuários (Startup/Investidor) | Público |
-| `POST` | `/api/auth/login` | Autenticação e geração de token | Público |
-| `GET` | `/api/startups` | Listagem e busca de startups com filtros | Autenticado |
-| `GET` | `/api/startups/:id` | Detalhes do perfil da startup | Autenticado |
-| `PUT` | `/api/startups/profile` | Atualização do perfil da startup logada | Startup |
-| `GET` | `/api/investors` | Listagem e busca de investidores com filtros | Autenticado |
-| `PUT` | `/api/investors/profile` | Atualização da tese do investidor logado | Investidor |
-| `POST` | `/api/matches/interest` | Registrar manifestação de interesse | Autenticado |
-| `GET` | `/api/matches/dashboard` | Listar matches e oportunidades recomendadas | Autenticado |
+### Stack Tecnológica
+* **Frontend:** [React 19](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite](https://vite.dev/), PWA e CSS moderno.
+* **Backend (em construção):** [Node.js](https://nodejs.org/), API RESTful com arquitetura desacoplada.
+* **Linter & Qualidade de Código:** [Oxlint](https://oxc-project.github.io/), Git e GitHub.
 
 ---
 
@@ -158,40 +139,35 @@ graph TD
 
 ## ⚖ Governança e Conformidade LGPD
 
-O projeto é estruturado em conformidade com as diretrizes da **Lei Geral de Proteção de Dados (Lei nº 13.709/2018)**:
+O projeto adota princípios de privacidade desde a concepção (*Privacy by Design*), de acordo com a **Lei Geral de Proteção de Dados (Lei nº 13.709/2018)**:
 
 ### 1. Dados Pessoais Tratados
-* **Identificação e Contato:** Nome, e-mail, telefone, cargo e dados corporativos/institucionais.
-* **Dados de Negócio:** Informações financeiras declaradas, segmento e faturamento (tratados com consentimento explícito e níveis de visibilidade configuráveis).
+* **Identificação e Contato:** Nome, e-mail, telefone, cargo e vínculo institucional.
+* **Dados do Negócio:** Estágio, tese, faixas financeiras declaradas e métricas corporativas (sob consentimento e controle de visibilidade do usuário).
 
-### 2. Princípios e Segurança
-* **Finalidade e Necessidade:** Coleta apenas dos dados estritamente necessários para a operação de matchmaking.
-* **Segurança e Confidencialidade:** Armazenamento seguro de senhas com *hash*, comunicação cifrada via HTTPS e controle restrito de acesso aos dados sensíveis.
-* **Direitos dos Titulares:** Mecanismos para visualização, alteração e solicitação de exclusão de dados da conta.
-
-### 3. Regras de Uso da Plataforma
-* Veracidade obrigatória nas informações de captação e métricas financeiras.
-* Proibição de condutas abusivas, envio de spam ou uso indevido de contatos corporativos obtidos via plataforma.
+### 2. Segurança e Direitos
+* **Finalidade e Minimização:** Coleta estrita dos dados necessários para a operação do matchmaking.
+* **Segurança da Informação:** Proteção de senhas com *hash*, comunicação cifrada via HTTPS e controle restrito de acesso.
+* **Direitos do Titular:** Garantia de visualização, retificação e solicitação de exclusão dos dados cadastrais.
 
 ---
 
-## 📂 Estrutura do Projeto
+## 📂 Estrutura Atual do Repositório
 
 ```text
 nexo/
 ├── app/                    # Frontend da aplicação (React + Vite + TypeScript)
 │   ├── public/             # Arquivos públicos e assets estáticos
 │   ├── src/                # Código-fonte da interface
-│   │   ├── assets/         # Imagens, ícones e recursos visuais
-│   │   ├── components/     # Componentes reutilizáveis
-│   │   ├── pages/          # Páginas (Login, Cadastro, Dashboard, Busca, Perfil)
-│   │   ├── services/       # Integração com API REST
-│   │   ├── App.tsx         # Componente raiz
+│   │   ├── assets/         # Imagens e recursos visuais
+│   │   ├── App.css         # Estilos da aplicação
+│   │   ├── App.tsx         # Componente principal com as telas do MVP
+│   │   ├── index.css       # Estilos globais
 │   │   └── main.tsx        # Ponto de entrada do React
 │   ├── package.json        # Dependências e scripts do frontend
-│   └── vite.config.ts      # Configurações do Vite
-├── nexo_logo.png           # Logotipo oficial da aplicação
-└── README.md               # Documentação principal do repositório
+│   └── vite.config.ts      # Configuração do Vite
+├── nexo_logo.png           # Logotipo oficial da plataforma
+└── README.md               # Documentação do projeto
 ```
 
 ---
@@ -202,25 +178,23 @@ nexo/
 * [Node.js](https://nodejs.org/) (versão 20.x ou superior recomendada)
 * Gerenciador de pacotes `npm` ou `yarn`
 
-### 1. Clonar o Repositório
+### Passo a Passo
 ```bash
+# 1. Clonar o repositório
 git clone https://github.com/Pedro-Maciel77/nexo.git
 cd nexo
-```
 
-### 2. Executar o Frontend
-```bash
-# Acessar a pasta da aplicação
+# 2. Acessar a pasta do frontend
 cd app
 
-# Instalar as dependências
+# 3. Instalar as dependências
 npm install
 
-# Iniciar o servidor de desenvolvimento
+# 4. Iniciar o servidor de desenvolvimento
 npm run dev
 ```
 
-A aplicação estará disponível em `http://localhost:5173`.
+Acesse no navegador: `http://localhost:5173`.
 
 ---
 
