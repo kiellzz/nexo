@@ -76,17 +76,17 @@ O fluxo da plataforma contempla toda a jornada do usuário, desde a entrada até
 
 ```mermaid
 flowchart LR
-    A([Cadastro / Login]) --> B{Tipo de Perfil}
-    B -->|Startup| C[Perfil da Startup & Investimento Pretendido]
-    B -->|Investidor| D[Tese de Investimento & Faixa de Aporte]
-    C --> E[Busca & Descoberta]
+    A["Cadastro / Login"] --> B{"Tipo de Perfil"}
+    B -->|Startup| C["Perfil da Startup & Investimento"]
+    B -->|Investidor| D["Tese & Faixa de Aporte"]
+    C --> E["Busca & Descoberta"]
     D --> E
-    E --> F[Filtros & Recomendação]
-    F --> G[Identificação de Oportunidades]
-    G --> H[Manifestação de Interesse]
-    H --> I{Match Confirmado?}
-    I -->|Sim| J[Acesso a Contato & Dashboard de Conexões]
-    I -->|Pendente| K[Acompanhamento no Dashboard]
+    E --> F["Filtros & Recomendação"]
+    F --> G["Identificação de Oportunidades"]
+    G --> H["Manifestação de Interesse"]
+    H --> I{"Match Confirmado?"}
+    I -->|Sim| J["Dashboard de Conexões & Contato"]
+    I -->|Pendente| K["Acompanhamento no Dashboard"]
 ```
 
 ---
@@ -96,15 +96,15 @@ flowchart LR
 A arquitetura do projeto foi desenhada seguindo o modelo **cliente-servidor desacoplado**:
 
 ```mermaid
-graph TD
+flowchart TD
     Client["Frontend SPA / PWA (React 19 + TypeScript + Vite)"]
     API["Backend REST API (Node.js - Em Desenvolvimento)"]
     DB[("Banco de Dados Integrado (Em Desenvolvimento)")]
     IA["Módulo de Matchmaking / Filtros Inteligentes"]
 
-    Client <-->|HTTP / REST (JSON)| API
-    API <-->|Persistência / Queries| DB
-    API <-->|Processamento de Score| IA
+    Client <-->|"HTTP / REST"| API
+    API <-->|"Persistência / Queries"| DB
+    API <-->|"Processamento de Score"| IA
 ```
 
 ### Stack Tecnológica
