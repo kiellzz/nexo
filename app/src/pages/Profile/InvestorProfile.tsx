@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { Investor, UserRole } from '../../types'
 import { matches } from '../../data/mockData'
+import { ProgressBar } from '../../components/ui/ProgressBar'
 
 export function InvestorProfile({
   investor,
@@ -41,13 +42,7 @@ export function InvestorProfile({
           <div className="match-breakdown">
             <h4>Detalhamento de Compatibilidade</h4>
             {matches.map((item) => (
-              <div key={item.label} className="match-row">
-                <span className="match-label">{item.label}</span>
-                <div className="progress-bar">
-                  <span style={{ width: `${item.value}%` }} />
-                </div>
-                <strong className="match-val">{item.value}%</strong>
-              </div>
+              <ProgressBar key={item.label} label={item.label} value={item.value} />
             ))}
           </div>
         </div>

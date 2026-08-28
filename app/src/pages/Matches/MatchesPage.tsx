@@ -1,4 +1,7 @@
 import { matchCards } from '../../data/mockData'
+import { MatchBadge } from '../../components/ui/MatchBadge'
+import { Pill } from '../../components/ui/Pill'
+import { ProgressBar } from '../../components/ui/ProgressBar'
 
 export function MatchesPage() {
   return (
@@ -15,22 +18,13 @@ export function MatchesPage() {
         {matchCards.map((match) => (
           <article key={match.id} className="match-card">
             <div className="card-topline">
-              <span className="pill">{match.type === 'startup' ? 'Startup' : 'Investidor'}</span>
-              <span className="match-badge">
-                <span className="badge-dot" />
-                {match.match}% Match
-              </span>
+              <Pill>{match.type === 'startup' ? 'Startup' : 'Investidor'}</Pill>
+              <MatchBadge value={match.match} />
             </div>
             <h3>{match.name}</h3>
             <div className="match-breakdown">
               {match.reasons.map((reason) => (
-                <div key={reason.label} className="match-row">
-                  <span className="match-label">{reason.label}</span>
-                  <div className="progress-bar">
-                    <span style={{ width: `${reason.value}%` }} />
-                  </div>
-                  <strong className="match-val">{reason.value}%</strong>
-                </div>
+                <ProgressBar key={reason.label} label={reason.label} value={reason.value} />
               ))}
             </div>
             <button type="button" className="btn btn-primary full btn-match-connect">

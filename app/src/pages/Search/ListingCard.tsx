@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { Investor, Startup, UserRole } from '../../types'
+import { MatchBadge } from '../../components/ui/MatchBadge'
+import { Pill } from '../../components/ui/Pill'
 
 export function ListingCard({
   activeRole,
@@ -14,11 +16,8 @@ export function ListingCard({
     return (
       <article className="listing-card">
         <div className="card-topline">
-          <span className="pill">{investor.type}</span>
-          <span className="match-badge">
-            <span className="badge-dot" />
-            {investor.match}% Match
-          </span>
+          <Pill>{investor.type}</Pill>
+          <MatchBadge value={investor.match} />
         </div>
         <h3>{investor.name}</h3>
         <p className="listing-desc">{investor.thesis}</p>
@@ -39,11 +38,8 @@ export function ListingCard({
   return (
     <article className="listing-card">
       <div className="card-topline">
-        <span className="pill">{startup.sector}</span>
-        <span className="match-badge">
-          <span className="badge-dot" />
-          {startup.match}% Match
-        </span>
+        <Pill>{startup.sector}</Pill>
+        <MatchBadge value={startup.match} />
       </div>
       <h3>{startup.name}</h3>
       <p className="listing-desc">{startup.description}</p>

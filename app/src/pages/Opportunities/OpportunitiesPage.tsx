@@ -1,4 +1,6 @@
 import { opportunities } from '../../data/mockData'
+import { MatchBadge } from '../../components/ui/MatchBadge'
+import { Pill } from '../../components/ui/Pill'
 
 export function OpportunitiesPage() {
   return (
@@ -15,11 +17,8 @@ export function OpportunitiesPage() {
         {opportunities.map((item) => (
           <article key={item.id} className="opportunity-full-card">
             <div className="card-topline">
-              <span className="pill">{item.type}</span>
-              <span className="match-badge">
-                <span className="badge-dot" />
-                {item.match}% Match
-              </span>
+              <Pill>{item.type}</Pill>
+              <MatchBadge value={item.match} />
             </div>
             <h3>{item.name}</h3>
             <p className="full-card-desc">{item.description}</p>

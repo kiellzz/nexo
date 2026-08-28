@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 import { opportunities } from '../../data/mockData'
+import { MatchBadge } from '../../components/ui/MatchBadge'
+import { Pill } from '../../components/ui/Pill'
 
 export function FeaturedOpportunities() {
   return (
@@ -23,11 +25,8 @@ export function FeaturedOpportunities() {
         {opportunities.map((op) => (
           <article key={op.id} className="opportunity-card">
             <div className="card-topline">
-              <span className="pill">{op.type}</span>
-              <span className="match-badge">
-                <span className="badge-dot" />
-                {op.match}% Match
-              </span>
+              <Pill>{op.type}</Pill>
+              <MatchBadge value={op.match} />
             </div>
             <h3>{op.name}</h3>
             <p className="opportunity-sector">

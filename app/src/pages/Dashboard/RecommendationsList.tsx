@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { Investor, Startup, UserRole } from '../../types'
+import { MatchBadge } from '../../components/ui/MatchBadge'
+import { Pill } from '../../components/ui/Pill'
 
 export function RecommendationsList({
   activeRole,
@@ -24,15 +26,12 @@ export function RecommendationsList({
                 <p>{investor.type} • {investor.city}</p>
                 <div className="tag-row">
                   {investor.focus.map((focus) => (
-                    <span key={focus} className="pill lite">{focus}</span>
+                    <Pill key={focus} variant="lite">{focus}</Pill>
                   ))}
                 </div>
               </div>
               <div className="recommendation-meta">
-                <span className="match-badge">
-                  <span className="badge-dot" />
-                  {investor.match}% Fit
-                </span>
+                <MatchBadge value={investor.match} label="Fit" />
                 <span className="ticket-label">{investor.ticket}</span>
                 <Link to={`/perfil/investor/${investor.id}`} className="btn btn-secondary small">
                   Ver perfil
@@ -53,15 +52,12 @@ export function RecommendationsList({
               <h4>{startup.name}</h4>
               <p>{startup.sector} • {startup.city}</p>
               <div className="tag-row">
-                <span className="pill lite">{startup.stage}</span>
-                <span className="pill">{startup.model}</span>
+                <Pill variant="lite">{startup.stage}</Pill>
+                <Pill>{startup.model}</Pill>
               </div>
             </div>
             <div className="recommendation-meta">
-              <span className="match-badge">
-                <span className="badge-dot" />
-                {startup.match}% Fit
-              </span>
+              <MatchBadge value={startup.match} label="Fit" />
               <span className="ticket-label">{startup.investment}</span>
               <Link to={`/perfil/startup/${startup.id}`} className="btn btn-secondary small">
                 Ver perfil
