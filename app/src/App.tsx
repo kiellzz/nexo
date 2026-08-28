@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import {
   BrowserRouter,
   Link,
@@ -15,128 +14,59 @@ import {
   investors,
   matchCards,
   matches,
-  navItems,
   opportunities,
   startups,
 } from './data/mockData'
+import { AppShell } from './layout/AppShell'
+import { useAppShell } from './layout/useAppShell'
 import './App.css'
 
+function LoginRoute() {
+  const { setActiveRole } = useAppShell()
+  const navigate = useNavigate()
+  return <LoginPage setActiveRole={(role) => { setActiveRole(role); navigate('/dashboard') }} />
+}
+
+function SignupRoute() {
+  const { setActiveRole } = useAppShell()
+  const navigate = useNavigate()
+  return <SignupPage setActiveRole={(role) => { setActiveRole(role); navigate('/dashboard') }} />
+}
+
+function DashboardRoute() {
+  const { activeRole } = useAppShell()
+  return <DashboardPage activeRole={activeRole} />
+}
+
+function SearchRoute() {
+  const { activeRole } = useAppShell()
+  return <SearchPage activeRole={activeRole} />
+}
+
+function ProfileRoute() {
+  const { activeRole } = useAppShell()
+  return <ProfilePage activeRole={activeRole} />
+}
 
 function App() {
   return (
     <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
-  )
-}
-
-function AppContent() {
-  const [activeRole, setActiveRole] = useState<UserRole>('startup')
-  const navigate = useNavigate()
-
-  return (
-    <div className="app-shell">
-      <header className="topbar">
-        <div className="topbar-inner">
-          <Link to="/" className="brand" aria-label="Ir para a página inicial">
-            <div className="brand-logo-wrap">
-              <img src="/logo.png" alt="Nexo logo" className="brand-logo" />
-            </div>
-            <span className="brand-name">Nexo</span>
-          </Link>
-
-          <nav className="main-nav" aria-label="Navegação principal">
-            {navItems.map((item) => (
-              <Link key={item.label} to={item.href} className="nav-link">
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="nav-actions">
-            <Link to="/login" className="btn btn-nav-secondary">
-              Entrar
-            </Link>
-            <Link to="/signup" className="btn btn-primary btn-nav-cta">
-              <span>Criar conta</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-              </svg>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="page-content">
-        <Routes>
+      <Routes>
+        <Route element={<AppShell />}>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage setActiveRole={(role) => { setActiveRole(role); navigate('/dashboard') }} />} />
-          <Route path="/signup" element={<SignupPage setActiveRole={(role) => { setActiveRole(role); navigate('/dashboard') }} />} />
-          <Route path="/dashboard" element={<DashboardPage activeRole={activeRole} />} />
-          <Route path="/buscar" element={<SearchPage activeRole={activeRole} />} />
+          <Route path="/login" element={<LoginRoute />} />
+          <Route path="/signup" element={<SignupRoute />} />
+          <Route path="/dashboard" element={<DashboardRoute />} />
+          <Route path="/buscar" element={<SearchRoute />} />
           <Route path="/oportunidades" element={<OpportunitiesPage />} />
           <Route path="/matches" element={<MatchesPage />} />
           <Route path="/interesses" element={<InterestsPage />} />
-          <Route path="/perfil/:type/:id" element={<ProfilePage activeRole={activeRole} />} />
+          <Route path="/perfil/:type/:id" element={<ProfileRoute />} />
           <Route path="/configuracoes" element={<SettingsPage />} />
           <Route path="/privacidade" element={<PrivacyPage />} />
-        </Routes>
-      </main>
-
-      <footer className="footer">
-        <div className="footer-top">
-          <div className="footer-brand-column">
-            <Link to="/" className="brand">
-              <div className="brand-logo-wrap small">
-                <img src="/logo.png" alt="Nexo logo" className="brand-logo small" />
-              </div>
-              <span className="brand-name">Nexo</span>
-            </Link>
-            <p className="footer-tagline">
-              A plataforma inteligente que conecta startups escaláveis aos investidores certos com inteligência e precisão.
-            </p>
-          </div>
-
-          <div className="footer-links-grid">
-            <div className="footer-col">
-              <h4>Plataforma</h4>
-              <Link to="/buscar">Buscar Startups</Link>
-              <Link to="/buscar">Buscar Investidores</Link>
-              <Link to="/oportunidades">Rodadas Abertas</Link>
-              <Link to="/signup">Cadastrar Empresa</Link>
-            </div>
-            <div className="footer-col">
-              <h4>Navegação</h4>
-              <Link to="/">Início</Link>
-              <Link to="/#como-funciona">Como Funciona</Link>
-              <Link to="/dashboard">Dashboard</Link>
-              <Link to="/matches">Matches</Link>
-            </div>
-            <div className="footer-col">
-              <h4>Institucional & Legal</h4>
-              <Link to="/privacidade">Termos de Uso</Link>
-              <Link to="/privacidade">Política de Privacidade</Link>
-              <Link to="/privacidade">LGPD & Segurança</Link>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">LinkedIn Oficial</a>
-            </div>
-          </div>
-        </div>
-
-        <div className="footer-bottom">
-          <p>© {new Date().getFullYear()} Nexo Tecnologia S.A. Todos os direitos reservados.</p>
-          <div className="footer-badges">
-            <span className="secure-badge">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-              </svg>
-              Conexões Criptografadas & LGPD Compliant
-            </span>
-          </div>
-        </div>
-      </footer>
-    </div>
+        </Route>
+      </Routes>
+    </BrowserRouter>
   )
 }
 
