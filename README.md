@@ -16,6 +16,10 @@
   <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Vite-6.x-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
   <img src="https://img.shields.io/badge/LGPD-Planejada-blue?style=for-the-badge" alt="LGPD" />
+  <a href="https://trello.com/b/H6sAjFhC/pi-nexo" target="_blank">
+    <img src="https://img.shields.io/badge/Trello-PI_Nexo-0052CC?style=for-the-badge&logo=trello&logoColor=white" alt="Quadro do Trello" />
+  </a>
+</p>
 </p>
 
 ---
