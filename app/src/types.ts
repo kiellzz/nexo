@@ -51,3 +51,34 @@ export type MatchItem = {
   match: number
   reasons: MatchReason[]
 }
+
+// ─── Signup form data ────────────────────────────────────────────────────────
+
+export type StartupStage = 'Pré-semente' | 'Seed' | 'Série A' | 'Expansion'
+export type InvestorType = 'Anjo' | 'Fundo' | 'Family Office'
+
+export interface StartupSignupData {
+  name: string
+  email: string
+  password: string
+  confirmPassword: string
+  description: string
+  stage: StartupStage
+  sectors: string[]
+  /** Faixa de investimento como tupla numérica [min, max] em reais */
+  investmentRange: [number, number]
+  terms: boolean
+}
+
+export interface InvestorSignupData {
+  name: string
+  email: string
+  password: string
+  confirmPassword: string
+  investorType: InvestorType
+  areas: string[]
+  /** Faixa de ticket como tupla numérica [min, max] em reais */
+  ticketRange: [number, number]
+  city: string
+  terms: boolean
+}
