@@ -1,4 +1,5 @@
-:root {
+:root,
+[data-theme="light"] {
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-heading: 'Plus Jakarta Sans', var(--font-sans);
 
@@ -21,10 +22,54 @@
   --text-secondary: #475569;
   --text-muted: #64748b;
   --text-inverted: #f8fafc;
+  --text-error: #dc2626;
+  --border-error: #dc2626;
+  --bg-error-field: #fff5f5;
+  --bg-error-soft: rgba(220, 38, 38, 0.08);
   
   --border-light: rgba(15, 23, 42, 0.08);
   --border-glass: rgba(255, 255, 255, 0.18);
   --border-focus: rgba(2, 132, 199, 0.5);
+  --border-subtle: rgba(255, 255, 255, 0.12);
+
+  --bg-header: #ffffff;
+  --text-header: #0f172a;
+  --bg-nav-pill: rgba(15, 23, 42, 0.03);
+  --bg-nav-pill-active: #f1f5f9;
+  --bg-nav-hover: rgba(255, 255, 255, 0.9);
+  --bg-hero: linear-gradient(135deg, #0b1220 0%, #16233a 100%);
+  --text-hero-title: #ffffff;
+  --text-hero-body: #94a3b8;
+  --accent-cyan: #38bdf8;
+  --accent-green: #34d399;
+  --accent-teal: #2dd4bf;
+  --bg-cta-primary: #2563eb;
+  --bg-cta-primary-hover: #1d4ed8;
+  --bg-cta-secondary: transparent;
+  --border-cta-secondary: #334155;
+  --text-cta-secondary: #ffffff;
+  --bg-stats-card: rgba(30, 41, 59, 0.8);
+  --bg-match-panel: #111827;
+  --bg-match-panel-soft: rgba(255, 255, 255, 0.06);
+  --text-match-panel: #ffffff;
+  --bg-badge-success: #0f3b2e;
+  --text-badge-success: #34d399;
+  --progress-track: var(--border-subtle);
+  --theme-toggle-bg: var(--bg-nav-pill-active);
+  --theme-toggle-border: rgba(2, 132, 199, 0.18);
+  --theme-toggle-text: var(--text-header);
+  --range-slider-bg: linear-gradient(180deg, rgba(248, 250, 252, 0.95), rgba(241, 245, 249, 0.72));
+  --range-slider-border: var(--border-light);
+  --range-slider-pill-bg: rgba(255, 255, 255, 0.78);
+  --range-slider-pill-border: rgba(2, 132, 199, 0.12);
+  --range-slider-pill-label: var(--text-muted);
+  --range-slider-track: #dbe5ef;
+  --range-slider-thumb-bg: #ffffff;
+  --range-slider-thumb-shadow: rgba(15, 23, 42, 0.38);
+  --range-slider-thumb-shadow-hover: rgba(15, 23, 42, 0.45);
+  --range-slider-focus-ring: rgba(2, 132, 199, 0.14);
+  --range-slider-scale: var(--text-muted);
+  --range-slider-surface-highlight: rgba(255, 255, 255, 0.85);
 
   --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-sm: 0 2px 8px -2px rgba(15, 23, 42, 0.06), 0 1px 4px -1px rgba(15, 23, 42, 0.04);
@@ -43,6 +88,7 @@
   --transition-bounce: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   font-family: var(--font-sans);
+  color-scheme: light;
   line-height: 1.5;
   font-weight: 400;
   color: var(--text-primary);
@@ -51,6 +97,98 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+[data-theme="dark"] {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: 'Plus Jakarta Sans', var(--font-sans);
+  color-scheme: dark;
+
+  --bg-main: #0b0f17;
+  --bg-surface: #131a26;
+  --bg-surface-elevated: #1b2433;
+  --bg-alt: #1b2433;
+
+  --color-brand-primary: #38bdf8;
+  --color-brand-primary-hover: #7dd3fc;
+  --color-brand-gradient-start: #38bdf8;
+  --color-brand-gradient-end: #34d399;
+
+  --color-accent-cyan: #38bdf8;
+  --color-accent-teal: #2dd4bf;
+  --color-accent-emerald: #34d399;
+
+  --text-primary: #eef1f6;
+  --text-secondary: #b4bdcc;
+  --text-muted: #7a8699;
+  --text-inverted: #0b0f17;
+  --text-error: #f87171;
+  --border-error: #ef4444;
+  --bg-error-field: #2a1218;
+  --bg-error-soft: rgba(239, 68, 68, 0.14);
+
+  --border-light: #232d3d;
+  --border-glass: rgba(255, 255, 255, 0.14);
+  --border-focus: rgba(56, 189, 248, 0.55);
+  --border-subtle: #232d3d;
+
+  --bg-header: #131a26;
+  --text-header: #eef1f6;
+  --bg-nav-pill: #1b2433;
+  --bg-nav-pill-active: #1b2433;
+  --bg-nav-hover: #232d3d;
+  --bg-hero: linear-gradient(135deg, #0b0f17 0%, #131a26 100%);
+  --text-hero-title: #eef1f6;
+  --text-hero-body: #b4bdcc;
+  --accent-cyan: #38bdf8;
+  --accent-green: #34d399;
+  --accent-teal: #2dd4bf;
+  --bg-cta-primary: #2563eb;
+  --bg-cta-primary-hover: #3b82f6;
+  --bg-cta-secondary: transparent;
+  --border-cta-secondary: #333f54;
+  --text-cta-secondary: #eef1f6;
+  --bg-stats-card: #1b2433;
+  --bg-match-panel: #1b2433;
+  --bg-match-panel-soft: #131a26;
+  --text-match-panel: #eef1f6;
+  --bg-badge-success: #113328;
+  --text-badge-success: #34d399;
+  --progress-track: #333f54;
+  --theme-toggle-bg: #1b2433;
+  --theme-toggle-border: #333f54;
+  --theme-toggle-text: #eef1f6;
+  --range-slider-bg: linear-gradient(180deg, #131a26 0%, #1b2433 100%);
+  --range-slider-border: #333f54;
+  --range-slider-pill-bg: #0f1623;
+  --range-slider-pill-border: #333f54;
+  --range-slider-pill-label: #b4bdcc;
+  --range-slider-track: #333f54;
+  --range-slider-thumb-bg: #0b0f17;
+  --range-slider-thumb-shadow: rgba(0, 0, 0, 0.48);
+  --range-slider-thumb-shadow-hover: rgba(0, 0, 0, 0.6);
+  --range-slider-focus-ring: rgba(56, 189, 248, 0.2);
+  --range-slider-scale: #b4bdcc;
+  --range-slider-surface-highlight: rgba(255, 255, 255, 0.08);
+
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.24);
+  --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.32), 0 1px 4px -1px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 12px 24px -4px rgba(0, 0, 0, 0.38), 0 4px 12px -2px rgba(0, 0, 0, 0.28);
+  --shadow-lg: 0 20px 35px -8px rgba(0, 0, 0, 0.46), 0 8px 16px -4px rgba(0, 0, 0, 0.32);
+  --shadow-glow: 0 0 30px -5px rgba(56, 189, 248, 0.35);
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+
+  --transition-fast: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  color: var(--text-primary);
+  background: var(--bg-main);
 }
 
 * {
@@ -68,6 +206,34 @@ body {
   background: var(--bg-main);
   color: var(--text-primary);
   overflow-x: hidden;
+}
+
+body,
+.topbar,
+.main-nav,
+.nav-link,
+.btn,
+.brand-name,
+.theme-toggle,
+.hero-section-full,
+.eyebrow-badge,
+.hero-stats-bar,
+.match-showcase-card,
+.party-box,
+.match-reasons-preview,
+.floating-metric-badge {
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
 }
 
 h1, h2, h3, h4, h5, h6 {

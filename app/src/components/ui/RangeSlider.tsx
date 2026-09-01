@@ -24,27 +24,31 @@ export function RangeSlider({
 }: RangeSliderProps) {
   const id = useId()
   const [lo, hi] = value
+  const range = max - min || 1
 
   function handleMinChange(next: number) {
-    onChange([Math.min(next, hi - step), hi])
+    onChange([Math.max(min, Math.min(next, hi - step)), hi])
   }
 
   function handleMaxChange(next: number) {
-    onChange([lo, Math.max(next, lo + step)])
+    onChange([lo, Math.min(max, Math.max(next, lo + step))])
   }
 
-  const loPercent = ((lo - min) / (max - min)) * 100
-  const hiPercent = ((hi - min) / (max - min)) * 100
-
-  // NOVO: Se o valor mínimo estiver colado no máximo, ele vem para frente
-  // para garantir que o usuário consiga puxá-lo de volta.
-  const minZIndex = lo > max - step * 2 ? 5 : 3;
+  const loPercent = ((lo - min) / range) * 100
+  const hiPercent = ((hi - min) / range) * 100
+  const minZIndex = lo > max - step * 2 ? 5 : 3
 
   return (
     <div className="range-slider">
       <div className="range-slider-labels">
-        <span>{formatLabel(lo)}</span>
-        <span>{formatLabel(hi)}</span>
+        <span className="range-slider-value-pill">
+          <span>Mínimo</span>
+          <strong>{formatLabel(lo)}</strong>
+        </span>
+        <span className="range-slider-value-pill">
+          <span>Máximo</span>
+          <strong>{formatLabel(hi)}</strong>
+        </span>
       </div>
 
       <div className="range-slider-track-wrap">
@@ -64,7 +68,8 @@ export function RangeSlider({
           onChange={(e) => handleMinChange(Number(e.target.value))}
           className="range-slider-input range-slider-input-min"
           aria-label="Investimento mínimo"
-          style={{ zIndex: minZIndex }} /* Aplicando o Z-index dinâmico */
+          aria-valuetext={formatLabel(lo)}
+          style={{ zIndex: minZIndex }}
         />
         <input
           type="range"
@@ -76,8 +81,13 @@ export function RangeSlider({
           onChange={(e) => handleMaxChange(Number(e.target.value))}
           className="range-slider-input range-slider-input-max"
           aria-label="Investimento máximo"
-          /* Z-index fixo em 4 (definido no CSS) */
+          aria-valuetext={formatLabel(hi)}
         />
+      </div>
+
+      <div className="range-slider-scale" aria-hidden="true">
+        <span>{formatLabel(min)}</span>
+        <span>{formatLabel(max)}</span>
       </div>
     </div>
   )

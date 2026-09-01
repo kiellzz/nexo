@@ -1,17 +1,19 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
+import type { UseFormRegisterReturn } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import type { UserRole } from '../types'
-import { SECTOR_TAGS } from '../data/signupOptions'
+import { SECTOR_TAGS, SLIDER_MAX, SLIDER_MIN, SLIDER_STEP } from '../data/signupOptions'
 import { TagSelector } from '../components/ui/TagSelector'
 import { RangeSlider } from '../components/ui/RangeSlider'
+import { seedProfileFromSignup } from '../utils/userProfileStorage'
 
 // ─── Investment range constants ───────────────────────────────────────────────
 
-const INVESTMENT_MIN_BOUND = 0
-const INVESTMENT_MAX_BOUND = 2_000_000
-const INVESTMENT_STEP = 10_000
+const INVESTMENT_MIN_BOUND = SLIDER_MIN
+const INVESTMENT_MAX_BOUND = SLIDER_MAX
+const INVESTMENT_STEP = SLIDER_STEP
 const DEFAULT_INVESTMENT_MIN = 100_000
 const DEFAULT_INVESTMENT_MAX = 500_000
 
@@ -66,6 +68,50 @@ const investorSchema = z
 
 type StartupFormData = z.infer<typeof startupSchema>
 type InvestorFormData = z.infer<typeof investorSchema>
+type LegalModalType = 'terms' | 'privacy'
+
+const legalModalContent: Record<LegalModalType, {
+  title: string
+  eyebrow: string
+  sections: Array<{ title: string; body: string }>
+}> = {
+  terms: {
+    eyebrow: 'Termos legais',
+    title: 'Termos de Uso',
+    sections: [
+      {
+        title: '1. Uso da plataforma',
+        body: 'Ao criar uma conta na Nexo, você concorda em utilizar a plataforma para fins legítimos de conexão entre startups, investidores e oportunidades do ecossistema de inovação.',
+      },
+      {
+        title: '2. Informações fornecidas',
+        body: 'Você declara que os dados informados no cadastro são verdadeiros, atuais e podem ser utilizados para melhorar recomendações, scores de compatibilidade e fluxos de matchmaking dentro da plataforma.',
+      },
+      {
+        title: '3. Responsabilidades',
+        body: 'A Nexo facilita conexões qualificadas, mas decisões de investimento, parceria ou contratação devem ser avaliadas diretamente pelas partes envolvidas, com a diligência adequada.',
+      },
+    ],
+  },
+  privacy: {
+    eyebrow: 'Privacidade & LGPD',
+    title: 'Política de Privacidade',
+    sections: [
+      {
+        title: '1. Consentimento e tratamento de dados',
+        body: 'Ao utilizar a plataforma Nexo, você concorda com o processamento dos dados empresariais e de contato informados para fins exclusivos de matchmaking, geração de scores de compatibilidade e recomendações no ecossistema.',
+      },
+      {
+        title: '2. Confidencialidade',
+        body: 'Informações de tração financeira, métricas sensíveis e dados confidenciais são protegidos e apenas compartilhados conforme permissões e objetivos definidos na experiência da plataforma.',
+      },
+      {
+        title: '3. Direitos do titular',
+        body: 'Em conformidade com a LGPD, você pode solicitar a visualização, correção, anonimização ou exclusão dos seus dados pelos canais de privacidade da Nexo.',
+      },
+    ],
+  },
+}
 
 // ─── Spinner ──────────────────────────────────────────────────────────────────
 
@@ -97,6 +143,82 @@ function FieldError({ message }: { message?: string }) {
   return <p className="field-error">{message}</p>
 }
 
+function LegalModal({
+  type,
+  onClose,
+}: {
+  type: LegalModalType
+  onClose: () => void
+}) {
+  const content = legalModalContent[type]
+
+  return (
+    <div className="legal-modal-backdrop" role="presentation" onMouseDown={onClose}>
+      <div
+        className="legal-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="legal-modal-title"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <div className="legal-modal-header">
+          <div>
+            <span>{content.eyebrow}</span>
+            <h3 id="legal-modal-title">{content.title}</h3>
+          </div>
+          <button
+            type="button"
+            className="legal-modal-close"
+            onClick={onClose}
+            aria-label="Fechar modal"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div className="legal-modal-content">
+          {content.sections.map((section) => (
+            <section key={section.title}>
+              <h4>{section.title}</h4>
+              <p>{section.body}</p>
+            </section>
+          ))}
+        </div>
+
+        <button type="button" className="btn btn-primary full" onClick={onClose}>
+          Entendi
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function LegalConsentLinks({
+  checkboxId,
+  registerTerms,
+  onOpen,
+}: {
+  checkboxId: string
+  registerTerms: UseFormRegisterReturn
+  onOpen: (type: LegalModalType) => void
+}) {
+  return (
+    <div className="terms-row">
+      <input id={checkboxId} type="checkbox" {...registerTerms} />
+      <span>
+        <label htmlFor={checkboxId}>Li e aceito os </label>
+        <button type="button" className="text-link" onClick={() => onOpen('terms')}>
+          Termos de Uso
+        </button>{' '}
+        e{' '}
+        <button type="button" className="text-link" onClick={() => onOpen('privacy')}>
+          Política de Privacidade
+        </button>
+      </span>
+    </div>
+  )
+}
+
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function SignupPage({
@@ -106,6 +228,18 @@ export function SignupPage({
 }) {
   const [signupMode, setSignupMode] = useState<UserRole>('startup')
   const [loading, setLoading] = useState(false)
+  const [legalModal, setLegalModal] = useState<LegalModalType | null>(null)
+
+  useEffect(() => {
+    if (!legalModal) return undefined
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setLegalModal(null)
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [legalModal])
 
   // ── Startup form ────────────────────────────────────────────────────────────
   const startupForm = useForm<StartupFormData>({
@@ -137,17 +271,35 @@ export function SignupPage({
   }
 
   // ── Submit handlers ─────────────────────────────────────────────────────────
-  function handleStartupSubmit(_data: StartupFormData) {
+  function handleStartupSubmit(data: StartupFormData) {
     setLoading(true)
     setTimeout(() => {
+      seedProfileFromSignup('startup', {
+        name: data.name,
+        email: data.email,
+        description: data.description,
+        stage: data.stage,
+        sectors: data.sectors,
+        investmentMin: data.investmentMin,
+        investmentMax: data.investmentMax,
+      })
       setLoading(false)
       setActiveRole('startup')
     }, 1500)
   }
 
-  function handleInvestorSubmit(_data: InvestorFormData) {
+  function handleInvestorSubmit(data: InvestorFormData) {
     setLoading(true)
     setTimeout(() => {
+      seedProfileFromSignup('investor', {
+        name: data.name,
+        email: data.email,
+        investorType: data.investorType,
+        areas: data.areas,
+        ticketMin: data.ticketMin,
+        ticketMax: data.ticketMax,
+        city: data.city,
+      })
       setLoading(false)
       setActiveRole('investor')
     }, 1500)
@@ -308,14 +460,11 @@ export function SignupPage({
 
             {/* Terms */}
             <div className="field-group">
-              <label className="terms-row">
-                <input type="checkbox" {...startupForm.register('terms')} />
-                <span>
-                  Li e aceito os{' '}
-                  <a href="#" className="text-link">Termos de Uso</a> e{' '}
-                  <a href="#" className="text-link">Política de Privacidade</a>
-                </span>
-              </label>
+              <LegalConsentLinks
+                checkboxId="s-terms"
+                registerTerms={startupForm.register('terms')}
+                onOpen={setLegalModal}
+              />
               <FieldError message={startupForm.formState.errors.terms?.message} />
             </div>
 
@@ -459,14 +608,11 @@ export function SignupPage({
 
             {/* Terms */}
             <div className="field-group">
-              <label className="terms-row">
-                <input type="checkbox" {...investorForm.register('terms')} />
-                <span>
-                  Li e aceito os{' '}
-                  <a href="#" className="text-link">Termos de Uso</a> e{' '}
-                  <a href="#" className="text-link">Política de Privacidade</a>
-                </span>
-              </label>
+              <LegalConsentLinks
+                checkboxId="i-terms"
+                registerTerms={investorForm.register('terms')}
+                onOpen={setLegalModal}
+              />
               <FieldError message={investorForm.formState.errors.terms?.message} />
             </div>
 
@@ -496,6 +642,7 @@ export function SignupPage({
           </a>
         </p>
       </div>
+      {legalModal && <LegalModal type={legalModal} onClose={() => setLegalModal(null)} />}
     </section>
   )
 }

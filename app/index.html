@@ -4,6 +4,19 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (() => {
+        try {
+          const storageKey = 'nexo-theme'
+          const savedTheme = localStorage.getItem(storageKey)
+          const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+          const theme = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : systemTheme
+          document.documentElement.dataset.theme = theme
+        } catch {
+          document.documentElement.dataset.theme = 'light'
+        }
+      })()
+    </script>
     <title>Nexo — Conectando Startups a Investidores</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

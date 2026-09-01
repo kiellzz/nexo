@@ -20,8 +20,8 @@ export const SECTOR_TAGS: string[] = [
 
 // ─── RangeSlider ──────────────────────────────────────────────────────────────
 
-/** Valor mínimo do slider de investimento (R$0) */
-export const SLIDER_MIN = 0
+/** Valor mínimo do slider de investimento (R$50k) */
+export const SLIDER_MIN = 50_000
 
 /** Valor máximo do slider de investimento (R$2M) */
 export const SLIDER_MAX = 2_000_000
@@ -31,7 +31,7 @@ export const SLIDER_STEP = 50_000
 
 /** Marcos visuais exibidos abaixo do trilho */
 export const SLIDER_MARKERS: number[] = [
-  0,
+  50_000,
   100_000,
   300_000,
   500_000,

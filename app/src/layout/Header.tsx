@@ -1,7 +1,33 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { navItems } from './navItems'
 
+type Theme = 'light' | 'dark'
+
+const THEME_STORAGE_KEY = 'nexo-theme'
+
+function getInitialTheme(): Theme {
+  if (typeof document !== 'undefined') {
+    const theme = document.documentElement.dataset.theme
+    if (theme === 'light' || theme === 'dark') return theme
+  }
+
+  return 'light'
+}
+
 export function Header() {
+  const [theme, setTheme] = useState<Theme>(getInitialTheme)
+  const nextTheme = theme === 'dark' ? 'light' : 'dark'
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, theme)
+    } catch {
+      // Theme still applies through data-theme even when storage is unavailable.
+    }
+  }, [theme])
+
   return (
     <header className="topbar">
       <div className="topbar-inner">
@@ -21,6 +47,15 @@ export function Header() {
         </nav>
 
         <div className="nav-actions">
+          <button
+            type="button"
+            className="theme-toggle"
+            aria-label={`Alternar para modo ${nextTheme === 'light' ? 'claro' : 'escuro'}`}
+            title={`Alternar para modo ${nextTheme === 'light' ? 'claro' : 'escuro'}`}
+            onClick={() => setTheme(nextTheme)}
+          >
+            <span aria-hidden="true">{theme === 'dark' ? '☀' : '☾'}</span>
+          </button>
           <Link to="/login" className="btn btn-nav-secondary">
             Entrar
           </Link>
