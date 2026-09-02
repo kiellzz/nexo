@@ -2264,6 +2264,10 @@
   cursor: pointer;
 }
 
+.checkbox-row input[type="checkbox"] {
+  accent-color: var(--color-brand-primary);
+}
+
 .privacy-card {
   max-width: 900px;
   gap: 1.5rem;
@@ -2634,6 +2638,23 @@
   align-items: center;
   justify-content: space-between;
   margin: 1.25rem 0;
+}
+
+.test-autofill-row {
+  align-items: flex-start;
+  width: 100%;
+  margin: 0.5rem 0 1.25rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--accent-cyan) 8%, var(--bg-alt));
+}
+
+.test-autofill-row span {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.35;
 }
 
 .muted-text {

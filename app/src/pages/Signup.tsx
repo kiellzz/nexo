@@ -7,6 +7,7 @@ import type { UserRole } from '../types'
 import { SECTOR_TAGS, SLIDER_MAX, SLIDER_MIN, SLIDER_STEP } from '../data/signupOptions'
 import { TagSelector } from '../components/ui/TagSelector'
 import { RangeSlider } from '../components/ui/RangeSlider'
+import { TEST_SIGNUP_DATA } from '../data/testAccounts'
 import { seedProfileFromSignup } from '../utils/userProfileStorage'
 
 // ─── Investment range constants ───────────────────────────────────────────────
@@ -69,6 +70,50 @@ const investorSchema = z
 type StartupFormData = z.infer<typeof startupSchema>
 type InvestorFormData = z.infer<typeof investorSchema>
 type LegalModalType = 'terms' | 'privacy'
+
+function getEmptyStartupFormValues(): StartupFormData {
+  return {
+    name: '',
+    description: '',
+    stage: 'Seed',
+    sectors: [],
+    investmentMin: DEFAULT_INVESTMENT_MIN,
+    investmentMax: DEFAULT_INVESTMENT_MAX,
+    email: '',
+    password: '',
+    confirmPassword: '',
+    terms: false,
+  }
+}
+
+function getEmptyInvestorFormValues(): InvestorFormData {
+  return {
+    name: '',
+    investorType: 'Anjo',
+    areas: [],
+    ticketMin: DEFAULT_INVESTMENT_MIN,
+    ticketMax: DEFAULT_INVESTMENT_MAX,
+    city: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    terms: false,
+  }
+}
+
+function getStartupTestFormValues(): StartupFormData {
+  return {
+    ...TEST_SIGNUP_DATA.startup,
+    sectors: [...TEST_SIGNUP_DATA.startup.sectors],
+  }
+}
+
+function getInvestorTestFormValues(): InvestorFormData {
+  return {
+    ...TEST_SIGNUP_DATA.investor,
+    areas: [...TEST_SIGNUP_DATA.investor.areas],
+  }
+}
 
 const legalModalContent: Record<LegalModalType, {
   title: string
@@ -229,6 +274,7 @@ export function SignupPage({
   const [signupMode, setSignupMode] = useState<UserRole>('startup')
   const [loading, setLoading] = useState(false)
   const [legalModal, setLegalModal] = useState<LegalModalType | null>(null)
+  const [useTestData, setUseTestData] = useState(false)
 
   useEffect(() => {
     if (!legalModal) return undefined
@@ -244,30 +290,55 @@ export function SignupPage({
   // ── Startup form ────────────────────────────────────────────────────────────
   const startupForm = useForm<StartupFormData>({
     resolver: zodResolver(startupSchema),
-    defaultValues: {
-      stage: 'Seed',
-      sectors: [],
-      investmentMin: DEFAULT_INVESTMENT_MIN,
-      investmentMax: DEFAULT_INVESTMENT_MAX,
-    },
+    defaultValues: getEmptyStartupFormValues(),
   })
 
   // ── Investor form ───────────────────────────────────────────────────────────
   const investorForm = useForm<InvestorFormData>({
     resolver: zodResolver(investorSchema),
-    defaultValues: {
-      investorType: 'Anjo',
-      areas: [],
-      ticketMin: DEFAULT_INVESTMENT_MIN,
-      ticketMax: DEFAULT_INVESTMENT_MAX,
-    },
+    defaultValues: getEmptyInvestorFormValues(),
   })
+
+  function resetFormByRole(role: UserRole) {
+    if (role === 'startup') {
+      startupForm.reset(getEmptyStartupFormValues())
+      return
+    }
+
+    investorForm.reset(getEmptyInvestorFormValues())
+  }
+
+  function preencherDadosAutomaticamenteParaTeste(role: UserRole) {
+    if (role === 'startup') {
+      startupForm.reset(getStartupTestFormValues())
+      return
+    }
+
+    investorForm.reset(getInvestorTestFormValues())
+  }
+
+  function handleTestDataToggle(checked: boolean) {
+    setUseTestData(checked)
+
+    if (checked) {
+      preencherDadosAutomaticamenteParaTeste(signupMode)
+      return
+    }
+
+    resetFormByRole(signupMode)
+  }
 
   // ── Toggle between modes ────────────────────────────────────────────────────
   function handleModeSwitch(mode: UserRole) {
     setSignupMode(mode)
-    startupForm.reset()
-    investorForm.reset()
+
+    if (useTestData) {
+      preencherDadosAutomaticamenteParaTeste(mode)
+      return
+    }
+
+    startupForm.reset(getEmptyStartupFormValues())
+    investorForm.reset(getEmptyInvestorFormValues())
   }
 
   // ── Submit handlers ─────────────────────────────────────────────────────────
@@ -336,6 +407,15 @@ export function SignupPage({
             Sou Investidor
           </button>
         </div>
+
+        <label className="checkbox-row test-autofill-row">
+          <input
+            type="checkbox"
+            checked={useTestData}
+            onChange={(event) => handleTestDataToggle(event.currentTarget.checked)}
+          />
+          <span>Preencher dados automaticamente para teste</span>
+        </label>
 
         {/* ── STARTUP FORM ─────────────────────────────────────────────────── */}
         {isStartup && (
