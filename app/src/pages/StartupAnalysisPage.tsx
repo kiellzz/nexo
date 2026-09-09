@@ -276,13 +276,13 @@ export function StartupAnalysisPage({ startup: propStartup, pendingStartups = []
         </div>
       </div>
 
-      {/* Pontuação Geral - IA */}
+      {/* Estatísticas & Probabilidades de Crescimento */}
       <div className="panel" style={{ marginBottom: '1.5rem', padding: '1.5rem 2rem' }}>
         <h3 style={{ marginTop: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span>🤖</span> Raio-X Diagnóstico por Inteligência Artificial
+          <span>📊</span> Estatísticas & Probabilidades de Crescimento
         </h3>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-          Auditoria algorítmica de métricas, saúde financeira, risco de mercado e projeção de retorno para investidores.
+          Modelagem estatística de métricas, saúde financeira, risco de mercado e projeção de retorno para investidores.
         </p>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', margin: '1.5rem 0' }}>

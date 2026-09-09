@@ -111,7 +111,7 @@ export function AdminPage({ pendingStartups, onUpdateStatus }: Props) {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.75rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                   <span>Captação: {formatCurrency(s.formData.targetAmount)}</span>
-                  <span>Score IA: <strong style={{ color: 'var(--accent, #6366f1)' }}>{s.analysis?.score ?? '—'}%</strong></span>
+                  <span>Score: <strong style={{ color: 'var(--accent, #6366f1)' }}>{s.analysis?.score ?? '—'}%</strong></span>
                 </div>
               </div>
             )
@@ -131,7 +131,7 @@ export function AdminPage({ pendingStartups, onUpdateStatus }: Props) {
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 {selected.analysis && (
                   <Link to={`/analise/${selected.id}`} className="btn btn-secondary small">
-                    Ver Raio-X Completo
+                    Ver Estatísticas Completas
                   </Link>
                 )}
               </div>
@@ -156,7 +156,7 @@ export function AdminPage({ pendingStartups, onUpdateStatus }: Props) {
             {selected.analysis && (
               <div style={{ padding: '1.25rem', background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '10px', marginBottom: '1.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <h4 style={{ margin: 0, color: 'var(--accent, #6366f1)' }}>🤖 Parecer da Inteligência Artificial</h4>
+                  <h4 style={{ margin: 0, color: 'var(--accent, #6366f1)' }}>📊 Parecer Estatístico & Probabilístico</h4>
                   <span style={{ fontWeight: 700, fontSize: '1.1rem' }}>Score: {selected.analysis.score}/100</span>
                 </div>
                 <p style={{ lineHeight: 1.5, margin: '0 0 1rem 0' }}>{selected.analysis.summary}</p>

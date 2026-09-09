@@ -357,20 +357,12 @@ function LandingPage() {
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-copy">
-          <span className="eyebrow">Matchmaking Inteligente de Investimentos</span>
+          <span className="eyebrow">Matchmaking de Investimentos</span>
           <h1>Conectamos startups promissoras aos investidores certos.</h1>
           <p>
-            O <strong>NEXO</strong> é uma plataforma bilateral que une startups em busca de captação a investidores qualificados. 
-            Com validação rigorosa de dados, diagnóstico preditivo por IA e métricas auditadas, eliminamos o ruído e aceleramos conexões assertivas.
+            O <strong>NEXO</strong> é uma plataforma bilateral que une startups em busca de captação a investidores qualificados.
+            Com validação rigorosa de dados, estatísticas preditivas e métricas auditadas, eliminamos o ruído e aceleramos conexões assertivas.
           </p>
-          <div className="cta-row" style={{ marginTop: '1.5rem', gap: '1rem', flexWrap: 'wrap' }}>
-            <Link to="/signup" className="btn btn-primary" style={{ padding: '0.9rem 2.2rem', fontSize: '1.05rem', fontWeight: 600 }}>
-              Criar conta no NEXO
-            </Link>
-            <Link to="/login" className="btn btn-secondary" style={{ padding: '0.9rem 1.75rem', fontSize: '1.05rem' }}>
-              Já tenho conta (Entrar)
-            </Link>
-          </div>
           <div className="hero-stats" style={{ marginTop: '2rem' }}>
             <div>
               <strong>1.2k+</strong>
@@ -421,10 +413,10 @@ function LandingPage() {
           </div>
 
           <div className="panel" style={{ padding: '1.75rem', borderTop: '4px solid #22c55e' }}>
-            <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.75rem' }}>🤖</span>
-            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem' }}>Raio-X Diagnóstico com IA</h3>
+            <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.75rem' }}>📊</span>
+            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem' }}>Estatísticas & Probabilidades</h3>
             <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.92rem', lineHeight: 1.6 }}>
-              Nossa inteligência artificial analisa a saúde financeira, defensabilidade do modelo e riscos operacionais da startup, gerando uma matriz SWOT detalhada para cada empresa.
+              Modelagem estatística analisa a saúde financeira, defensabilidade do modelo e riscos operacionais da startup, gerando uma matriz SWOT detalhada para cada empresa.
             </p>
           </div>
 
@@ -440,7 +432,7 @@ function LandingPage() {
             <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.75rem' }}>🤝</span>
             <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem' }}>Matchmaking Assertivo</h3>
             <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.92rem', lineHeight: 1.6 }}>
-              Investidores navegam pelo dealflow curado e encontram negócios alinhados à sua tese. Ao demonstrar interesse, a conexão é direta e instantânea com os fundadores.
+              Investidores navegam pelo catálogo curado e encontram negócios alinhados à sua tese. Ao demonstrar interesse, a conexão é direta e instantânea com os fundadores.
             </p>
           </div>
         </div>
@@ -458,7 +450,7 @@ function LandingPage() {
         <div className="steps-grid">
           {[
             { step: '01', title: 'Cadastro & Triagem', desc: 'Startups preenchem suas métricas reais e investidores definem suas teses de aporte e áreas de interesse.' },
-            { step: '02', title: 'Diagnóstico & Homologação', desc: 'A IA gera o Raio-X completo e o comitê administrativo aprova a publicação da startup no catálogo.' },
+            { step: '02', title: 'Análise & Homologação', desc: 'O sistema gera estatísticas e probabilidades de crescimento enquanto o comitê administrativo aprova a publicação da startup no catálogo.' },
             { step: '03', title: 'Descoberta no Catálogo', desc: 'Investidores exploram as startups aprovadas, analisam os gráficos de projeção e cenários de retorno.' },
             { step: '04', title: 'Match & Negociação', desc: 'Ao registrar interesse mútuo, o canal seguro é liberado para contato direto entre fundadores e investidores.' },
           ].map((item) => (
@@ -478,7 +470,7 @@ function LandingPage() {
           <h3>Conecte-se com smart money e acelere sua rodada</h3>
           <ul>
             <li>Exposição direta para investidores-anjo e fundos qualificados</li>
-            <li>Diagnóstico gratuito de pontos fortes, fraquezas e riscos via IA</li>
+            <li>Diagnóstico gratuito de pontos fortes, fraquezas e riscos via modelagem estatística</li>
             <li>Projeções de crescimento para valorizar seu negócio</li>
             <li>Fim do envio frio de pitch decks que ninguém lê</li>
           </ul>
@@ -486,10 +478,10 @@ function LandingPage() {
 
         <article className="benefit-card teal">
           <p className="label">Para Investidores</p>
-          <h3>Dealflow qualificado com métricas reais e auditoria</h3>
+          <h3>Catálogo qualificado com métricas reais e auditoria</h3>
           <ul>
             <li>Startups pré-filtradas e homologadas com números reais</li>
-            <li>Raio-X de saúde financeira e modelo de negócio gerado por IA</li>
+            <li>Estatísticas de saúde financeira e modelo de negócio auditadas</li>
             <li>Cenários preditivos de faturamento e valuation em 12 e 24 meses</li>
             <li>Filtros refinados por setor, tese, estágio e ticket de investimento</li>
           </ul>
@@ -591,7 +583,7 @@ function SignupPage({ setActiveRole }: { setActiveRole: (role: UserRole) => void
                 <span>🔐</span> Entrada Qualificada & Curadoria de Startups
               </h4>
               <p style={{ margin: 0, fontSize: '0.92rem', lineHeight: 1.5, color: 'var(--text-secondary)' }}>
-                No NEXO, nem toda startup é listada automaticamente. Para proteger a tese dos investidores e garantir dealflow de alta qualidade, sua empresa precisa passar por uma triagem com IA e aprovação do comitê administrativo.
+                No NEXO, nem toda startup é listada automaticamente. Para proteger a tese dos investidores e garantir um catálogo de alta qualidade, sua empresa precisa passar por uma triagem estatística e aprovação do comitê administrativo.
               </p>
               <ul style={{ margin: '0.75rem 0 0 0', paddingLeft: '1.2rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                 <li>Você preencherá métricas: faturamento, crescimento, custos e captação</li>
@@ -816,11 +808,11 @@ function SearchPage({ activeRole, approvedStartups }: { activeRole: UserRole; ap
     <section className="search-shell">
       <div className="search-topbar">
         <div>
-          <p className="label">{activeRole === 'startup' ? 'Busca de Investidores' : 'Catálogo Dealflow (Investidores)'}</p>
-          <h2>{activeRole === 'startup' ? 'Encontre investidores com tese alinhada' : 'Startups Homologadas & Auditadas por IA'}</h2>
+          <p className="label">{activeRole === 'startup' ? 'Busca de Investidores' : 'Catálogo de Oportunidades'}</p>
+          <h2>{activeRole === 'startup' ? 'Encontre investidores com tese alinhada' : 'Startups Homologadas & Auditadas'}</h2>
           {activeRole === 'investor' && (
             <p style={{ margin: '0.25rem 0 0 0', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-              Todas as empresas abaixo passaram pelo processo de triagem e possuem Raio-X com projeções de faturamento e análise de riscos disponíveis para investidores.
+              Todas as empresas abaixo passaram pelo processo de triagem e possuem estatísticas e projeções validadas disponíveis para investidores.
             </p>
           )}
         </div>
@@ -1140,14 +1132,14 @@ function ProfilePage({
               </div>
             </div>
 
-            {/* Raio-X com IA para o Investidor */}
+            {/* Estatísticas & Probabilidades para o Investidor */}
             <div className="panel" style={{ padding: '1.75rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: '1rem', marginBottom: '1.25rem' }}>
                 <div>
                   <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span>🤖</span> Raio-X Diagnóstico com IA
+                    <span>📊</span> Estatísticas & Probabilidades de Crescimento
                   </h3>
-                  <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Auditoria automatizada de saúde financeira, riscos e expansão</span>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Auditoria de saúde financeira, riscos e expansão</span>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Score Geral</span>
@@ -1171,7 +1163,7 @@ function ProfilePage({
               </div>
 
               <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px' }}>
-                <strong style={{ display: 'block', marginBottom: '0.25rem', color: 'var(--accent, #6366f1)' }}>Síntese da IA para Investidores:</strong>
+                <strong style={{ display: 'block', marginBottom: '0.25rem', color: 'var(--accent, #6366f1)' }}>Síntese Estatística para Investidores:</strong>
                 <p style={{ margin: 0, fontSize: '0.92rem', lineHeight: 1.5, color: 'var(--text-secondary)' }}>{customAnalysis.summary}</p>
               </div>
             </div>

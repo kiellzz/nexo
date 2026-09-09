@@ -208,7 +208,7 @@ export function StartupRegisterPage({ onSubmit }: Props) {
             </button>
           ) : (
             <button type="button" className="btn btn-primary" onClick={handleSubmit} disabled={loading}>
-              {loading ? '🤖 Analisando com IA...' : 'Submeter para Análise e Validação'}
+              {loading ? '📊 Gerando estatísticas e projeções...' : 'Submeter para Análise e Validação'}
             </button>
           )}
         </div>

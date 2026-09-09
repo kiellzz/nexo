@@ -15,9 +15,9 @@ const statusConfig = {
     tagColor: '#eab308',
   },
   analyzing: {
-    icon: '🤖',
-    label: 'Análise Concluída pela IA',
-    description: 'A IA gerou o Raio-X completo e métricas preditivas. Aguardando aprovação final do comitê.',
+    icon: '📊',
+    label: 'Análise Estatística Concluída',
+    description: 'As estatísticas e probabilidades de crescimento foram geradas. Aguardando aprovação final do comitê.',
     color: 'status-analyzing',
     tagBg: 'rgba(99, 102, 241, 0.15)',
     tagColor: '#6366f1',
@@ -25,7 +25,7 @@ const statusConfig = {
   approved: {
     icon: '✅',
     label: 'Aprovada para Captação',
-    description: 'Parabéns! Sua startup foi homologada e seu Raio-X já está disponível para investidores qualificados.',
+    description: 'Parabéns! Sua startup foi homologada e suas estatísticas já estão disponíveis para investidores qualificados.',
     color: 'status-approved',
     tagBg: 'rgba(34, 197, 94, 0.15)',
     tagColor: '#22c55e',
@@ -92,7 +92,7 @@ export function StartupStatusPage({ startup }: Props) {
             <strong>{startup.id}</strong>
           </div>
           <div>
-            <span style={{ color: 'var(--text-muted)', display: 'block' }}>Score IA</span>
+            <span style={{ color: 'var(--text-muted)', display: 'block' }}>Índice Estatístico</span>
             <strong style={{ color: 'var(--accent, #6366f1)' }}>{startup.analysis?.score ?? '—'}/100</strong>
           </div>
         </div>
@@ -100,7 +100,7 @@ export function StartupStatusPage({ startup }: Props) {
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
           {startup.analysis && (
             <Link to={`/analise/${startup.id}`} className="btn btn-primary">
-              📊 Visualizar Raio-X e Previsões
+              📊 Visualizar Estatísticas e Previsões
             </Link>
           )}
           {startup.status === 'rejected' && (
