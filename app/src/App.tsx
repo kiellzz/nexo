@@ -233,14 +233,6 @@ const matches = [
   { label: 'Mercado', value: 93 },
 ]
 
-const navItems = [
-  { label: 'Início', path: '/' },
-  { label: 'Oportunidades', path: '/oportunidades' },
-  { label: 'Cadastrar Startup', path: '/cadastro-startup' },
-  { label: 'Status Cadastro', path: '/status-analise' },
-  { label: 'Painel Admin', path: '/admin' },
-]
-
 function App() {
   return (
     <BrowserRouter>
@@ -297,18 +289,12 @@ function AppContent() {
         </Link>
 
         <nav className="main-nav" aria-label="Navegação principal">
-          {navItems.map((item) => (
-            <Link key={item.label} to={item.path} className="nav-link">
-              {item.label}
-            </Link>
-          ))}
+          <a href="#sobre" className="nav-link">O que é a Nexo</a>
+          <a href="#como-funciona" className="nav-link">Como funciona</a>
+          <a href="#beneficios" className="nav-link">Benefícios</a>
         </nav>
 
         <div className="nav-actions">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(255,255,255,0.06)', padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.8rem' }}>
-            <span style={{ color: 'var(--text-muted)' }}>Modo:</span>
-            <strong style={{ color: 'var(--accent, #6366f1)', textTransform: 'capitalize' }}>{activeRole}</strong>
-          </div>
           <Link to="/login" className="btn btn-secondary">Entrar</Link>
           <Link to="/signup" className="btn btn-primary">Criar conta</Link>
         </div>
@@ -358,7 +344,7 @@ function AppContent() {
           <Link to="/privacidade">Termos de uso</Link>
           <Link to="/privacidade">Política de privacidade</Link>
           <Link to="/privacidade">LGPD</Link>
-          <a href="#">LinkedIn</a>
+          <Link to="/admin" style={{ opacity: 0.6, fontSize: '0.85rem' }}>Acesso Administrativo</Link>
         </div>
       </footer>
     </div>
@@ -368,30 +354,35 @@ function AppContent() {
 function LandingPage() {
   return (
     <>
+      {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-copy">
-          <span className="eyebrow">Conecte capital e inovação</span>
-          <h1>Conectamos startups às oportunidades certas de investimento.</h1>
+          <span className="eyebrow">Matchmaking Inteligente de Investimentos</span>
+          <h1>Conectamos startups promissoras aos investidores certos.</h1>
           <p>
-            Descubra investidores com visão, encontre negócios compatíveis e acelere a próxima etapa da sua jornada.
+            O <strong>NEXO</strong> é uma plataforma bilateral que une startups em busca de captação a investidores qualificados. 
+            Com validação rigorosa de dados, diagnóstico preditivo por IA e métricas auditadas, eliminamos o ruído e aceleramos conexões assertivas.
           </p>
-          <div className="cta-row" style={{ flexWrap: 'wrap', gap: '0.75rem' }}>
-            <Link to="/cadastro-startup" className="btn btn-primary">Cadastrar Startup</Link>
-            <Link to="/analise" className="btn btn-secondary">Ver Raio-X com IA</Link>
-            <Link to="/admin" className="btn btn-ghost">Painel de Moderação</Link>
+          <div className="cta-row" style={{ marginTop: '1.5rem', gap: '1rem', flexWrap: 'wrap' }}>
+            <Link to="/signup" className="btn btn-primary" style={{ padding: '0.9rem 2.2rem', fontSize: '1.05rem', fontWeight: 600 }}>
+              Criar conta no NEXO
+            </Link>
+            <Link to="/login" className="btn btn-secondary" style={{ padding: '0.9rem 1.75rem', fontSize: '1.05rem' }}>
+              Já tenho conta (Entrar)
+            </Link>
           </div>
-          <div className="hero-stats">
+          <div className="hero-stats" style={{ marginTop: '2rem' }}>
             <div>
               <strong>1.2k+</strong>
-              <span>Startups ativas</span>
+              <span>Startups auditadas</span>
             </div>
             <div>
-              <strong>320</strong>
-              <span>Investidores</span>
+              <strong>320+</strong>
+              <span>Investidores ativos</span>
             </div>
             <div>
               <strong>94%</strong>
-              <span>Compatibilidade</span>
+              <span>Assertividade de match</span>
             </div>
           </div>
         </div>
@@ -410,72 +401,110 @@ function LandingPage() {
         </div>
       </section>
 
-      <section className="info-panel">
-        <div>
-          <p className="label">Como funciona</p>
-          <h2>Seu fluxo em 4 passos</h2>
+      {/* O que é o NEXO */}
+      <section id="sobre" className="info-panel" style={{ padding: '3.5rem 0', borderTop: '1px solid var(--border)' }}>
+        <div style={{ textAlign: 'center', maxWidth: '750px', margin: '0 auto 2.5rem auto' }}>
+          <p className="label">Conheça a plataforma</p>
+          <h2 style={{ fontSize: '2.2rem', margin: '0.5rem 0' }}>O que é o NEXO?</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', lineHeight: 1.6 }}>
+            Diferente de redes sociais abertas ou planilhas estáticas, o NEXO é um ambiente curado onde cada negócio é validado antes de ser exibido, criando uma ponte de confiança mútua entre fundadores e investidores.
+          </p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem', marginTop: '1.5rem' }}>
+          <div className="panel" style={{ padding: '1.75rem', borderTop: '4px solid var(--accent, #6366f1)' }}>
+            <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.75rem' }}>🛡️</span>
+            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem' }}>Curadoria & Governança</h3>
+            <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.92rem', lineHeight: 1.6 }}>
+              Nem toda empresa é listada automaticamente. As startups submetem métricas reais de faturamento, margens, clientes e custos, que passam por triagem e homologação administrativa.
+            </p>
+          </div>
+
+          <div className="panel" style={{ padding: '1.75rem', borderTop: '4px solid #22c55e' }}>
+            <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.75rem' }}>🤖</span>
+            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem' }}>Raio-X Diagnóstico com IA</h3>
+            <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.92rem', lineHeight: 1.6 }}>
+              Nossa inteligência artificial analisa a saúde financeira, defensabilidade do modelo e riscos operacionais da startup, gerando uma matriz SWOT detalhada para cada empresa.
+            </p>
+          </div>
+
+          <div className="panel" style={{ padding: '1.75rem', borderTop: '4px solid #eab308' }}>
+            <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.75rem' }}>📈</span>
+            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem' }}>Previsões em 3 Cenários</h3>
+            <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.92rem', lineHeight: 1.6 }}>
+              Projeções de crescimento de faturamento e valuation em 12 e 24 meses sob cenários 🔴 Pessimista, 🟡 Realista e 🟢 Otimista para embasar a tomada de decisão do investidor.
+            </p>
+          </div>
+
+          <div className="panel" style={{ padding: '1.75rem', borderTop: '4px solid #3b82f6' }}>
+            <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.75rem' }}>🤝</span>
+            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem' }}>Matchmaking Assertivo</h3>
+            <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.92rem', lineHeight: 1.6 }}>
+              Investidores navegam pelo dealflow curado e encontram negócios alinhados à sua tese. Ao demonstrar interesse, a conexão é direta e instantânea com os fundadores.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Como funciona */}
+      <section id="como-funciona" className="info-panel" style={{ padding: '3.5rem 0', borderTop: '1px solid var(--border)' }}>
+        <div style={{ textAlign: 'center', maxWidth: '650px', margin: '0 auto 2.5rem auto' }}>
+          <p className="label">Fluxo Simplificado</p>
+          <h2 style={{ fontSize: '2.2rem', margin: '0.5rem 0' }}>Como o NEXO funciona</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1rem' }}>
+            Um processo de 4 passos estruturado para proteger investidores e acelerar a captação de startups sérias.
+          </p>
         </div>
         <div className="steps-grid">
-          {['Crie seu perfil', 'Encontre oportunidades', 'Conheça perfis compatíveis', 'Conecte-se'].map((step, index) => (
-            <article key={step} className="step-card">
-              <span className="step-number">0{index + 1}</span>
-              <h3>{step}</h3>
-              <p>Estruture seu posicionamento e receba combinações relevantes para o próximo passo.</p>
+          {[
+            { step: '01', title: 'Cadastro & Triagem', desc: 'Startups preenchem suas métricas reais e investidores definem suas teses de aporte e áreas de interesse.' },
+            { step: '02', title: 'Diagnóstico & Homologação', desc: 'A IA gera o Raio-X completo e o comitê administrativo aprova a publicação da startup no catálogo.' },
+            { step: '03', title: 'Descoberta no Catálogo', desc: 'Investidores exploram as startups aprovadas, analisam os gráficos de projeção e cenários de retorno.' },
+            { step: '04', title: 'Match & Negociação', desc: 'Ao registrar interesse mútuo, o canal seguro é liberado para contato direto entre fundadores e investidores.' },
+          ].map((item) => (
+            <article key={item.step} className="step-card">
+              <span className="step-number">{item.step}</span>
+              <h3>{item.title}</h3>
+              <p>{item.desc}</p>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="benefit-grid">
+      {/* Benefícios */}
+      <section id="beneficios" className="benefit-grid" style={{ padding: '3rem 0', borderTop: '1px solid var(--border)' }}>
         <article className="benefit-card blue">
-          <p className="label">Para startups</p>
-          <h3>Encontre investidores com alinhamento estratégico</h3>
+          <p className="label">Para Startups</p>
+          <h3>Conecte-se com smart money e acelere sua rodada</h3>
           <ul>
-            <li>Encontrar investidores</li>
-            <li>Apresentar sua empresa</li>
-            <li>Encontrar investimentos compatíveis</li>
-            <li>Aumentar visibilidade</li>
+            <li>Exposição direta para investidores-anjo e fundos qualificados</li>
+            <li>Diagnóstico gratuito de pontos fortes, fraquezas e riscos via IA</li>
+            <li>Projeções de crescimento para valorizar seu negócio</li>
+            <li>Fim do envio frio de pitch decks que ninguém lê</li>
           </ul>
         </article>
 
         <article className="benefit-card teal">
-          <p className="label">Para investidores</p>
-          <h3>Descubra negócios com potencial e clareza</h3>
+          <p className="label">Para Investidores</p>
+          <h3>Dealflow qualificado com métricas reais e auditoria</h3>
           <ul>
-            <li>Descobrir startups</li>
-            <li>Filtrar oportunidades</li>
-            <li>Definir áreas de interesse</li>
-            <li>Encontrar negócios compatíveis</li>
+            <li>Startups pré-filtradas e homologadas com números reais</li>
+            <li>Raio-X de saúde financeira e modelo de negócio gerado por IA</li>
+            <li>Cenários preditivos de faturamento e valuation em 12 e 24 meses</li>
+            <li>Filtros refinados por setor, tese, estágio e ticket de investimento</li>
           </ul>
         </article>
       </section>
 
-      <section className="opportunity-preview">
-        <div className="section-header">
-          <div>
-            <p className="label">Oportunidades em destaque</p>
-            <h2>Matches e negócios com forte alinhamento</h2>
-          </div>
-          <Link to="/buscar" className="btn btn-secondary">Ver mais</Link>
-        </div>
-
-        <div className="opportunities-grid">
-          {opportunities.map((op) => (
-            <article key={op.id} className="opportunity-card">
-              <div className="card-topline">
-                <span className="pill">{op.type}</span>
-                <span className="match-badge">{op.match}%</span>
-              </div>
-              <h3>{op.name}</h3>
-              <p>{op.sector}</p>
-              <ul>
-                <li>{op.stage}</li>
-                <li>{op.value}</li>
-                <li>{op.date}</li>
-              </ul>
-            </article>
-          ))}
-        </div>
+      {/* CTA Final */}
+      <section style={{ textAlign: 'center', padding: '4rem 1.5rem', background: 'var(--surface-1, #1e293b)', borderRadius: '16px', margin: '2rem 0' }}>
+        <h2 style={{ fontSize: '2.2rem', marginBottom: '0.75rem' }}>Pronto para fazer conexões de alto valor?</h2>
+        <p style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto 2rem auto', fontSize: '1.05rem', lineHeight: 1.6 }}>
+          Crie sua conta agora mesmo. Seja você um fundador buscando investimento inteligente ou um investidor procurando as melhores startups.
+        </p>
+        <Link to="/signup" className="btn btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1.1rem', fontWeight: 600 }}>
+          Criar minha conta no NEXO ➔
+        </Link>
       </section>
     </>
   )
