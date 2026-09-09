@@ -23,7 +23,7 @@ function formatCurrency(value: number): string {
   return `R$ ${value.toLocaleString('pt-BR')}`
 }
 
-function ScoreCircle({ value, label, color }: { value: number; label: string; color: string }) {
+export function ScoreCircle({ value, label, color }: { value: number; label: string; color: string }) {
   const radius = 48
   const circumference = 2 * Math.PI * radius
   const offset = circumference - (value / 100) * circumference
@@ -53,7 +53,7 @@ function ScoreCircle({ value, label, color }: { value: number; label: string; co
   )
 }
 
-function IndicatorBar({ label, value, color }: { label: string; value: number; color: string }) {
+export function IndicatorBar({ label, value, color }: { label: string; value: number; color: string }) {
   return (
     <div className="match-row" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.75rem' }}>
       <span style={{ width: '200px', fontSize: '0.9rem' }}>{label}</span>
@@ -65,7 +65,7 @@ function IndicatorBar({ label, value, color }: { label: string; value: number; c
   )
 }
 
-function SwotCard({
+export function SwotCard({
   title,
   items,
   icon,
@@ -90,7 +90,7 @@ function SwotCard({
   )
 }
 
-function ScenarioCard({
+export function ScenarioCard({
   title,
   icon,
   growth12,
@@ -129,7 +129,7 @@ function ScenarioCard({
   )
 }
 
-function ProjectionChart({ analysis }: { analysis: StartupAnalysis }) {
+export function ProjectionChart({ analysis }: { analysis: StartupAnalysis }) {
   const currentRevenue = 1_200_000
   const data = [
     { name: 'Hoje', pessimista: currentRevenue, realista: currentRevenue, otimista: currentRevenue },
