@@ -9,8 +9,14 @@ import {
   useParams,
 } from 'react-router-dom'
 import './App.css'
+import { StartupRegisterPage } from './pages/StartupRegisterPage'
+import { StartupStatusPage } from './pages/StartupStatusPage'
+import { AdminPage } from './pages/AdminPage'
+import { StartupAnalysisPage } from './pages/StartupAnalysisPage'
+import { mockPendingStartups } from './data/mockData'
+import type { PendingStartup, ApprovalStatus } from './types'
 
-type UserRole = 'startup' | 'investor'
+type UserRole = 'startup' | 'investor' | 'admin'
 
 type Startup = {
   id: number
@@ -220,7 +226,13 @@ const matches = [
   { label: 'Mercado', value: 93 },
 ]
 
-const navItems = ['Início', 'Como funciona', 'Startups', 'Investidores', 'Sobre']
+const navItems = [
+  { label: 'Início', path: '/' },
+  { label: 'Oportunidades', path: '/oportunidades' },
+  { label: 'Cadastrar Startup', path: '/cadastro-startup' },
+  { label: 'Status Cadastro', path: '/status-analise' },
+  { label: 'Painel Admin', path: '/admin' },
+]
 
 function App() {
   return (
@@ -232,7 +244,23 @@ function App() {
 
 function AppContent() {
   const [activeRole, setActiveRole] = useState<UserRole>('startup')
+  const [pendingStartups, setPendingStartups] = useState<PendingStartup[]>(mockPendingStartups)
+  const [currentStartup, setCurrentStartup] = useState<PendingStartup | null>(mockPendingStartups[0])
   const navigate = useNavigate()
+
+  function handleRegisterStartup(newStartup: PendingStartup) {
+    setPendingStartups((prev) => [newStartup, ...prev])
+    setCurrentStartup(newStartup)
+  }
+
+  function handleUpdateStatus(id: string, status: ApprovalStatus, reason?: string) {
+    setPendingStartups((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, status, rejectionReason: reason } : s))
+    )
+    if (currentStartup?.id === id) {
+      setCurrentStartup((prev) => (prev ? { ...prev, status, rejectionReason: reason } : null))
+    }
+  }
 
   return (
     <div className="app-shell">
@@ -244,13 +272,16 @@ function AppContent() {
 
         <nav className="main-nav" aria-label="Navegação principal">
           {navItems.map((item) => (
-            <Link key={item} to="/" className="nav-link">
-              {item}
+            <Link key={item.label} to={item.path} className="nav-link">
+              {item.label}
             </Link>
           ))}
         </nav>
 
         <div className="nav-actions">
+          <Link to="/cadastro-startup" className="btn btn-secondary" style={{ borderColor: 'var(--accent, #6366f1)', color: 'var(--accent, #6366f1)' }}>
+            + Nova Startup
+          </Link>
           <Link to="/login" className="btn btn-secondary">Entrar</Link>
           <Link to="/signup" className="btn btn-primary">Criar conta</Link>
         </div>
@@ -267,6 +298,11 @@ function AppContent() {
           <Route path="/matches" element={<MatchesPage />} />
           <Route path="/interesses" element={<InterestsPage />} />
           <Route path="/perfil/:type/:id" element={<ProfilePage activeRole={activeRole} />} />
+          <Route path="/cadastro-startup" element={<StartupRegisterPage onSubmit={handleRegisterStartup} />} />
+          <Route path="/status-analise" element={<StartupStatusPage startup={currentStartup} />} />
+          <Route path="/admin" element={<AdminPage pendingStartups={pendingStartups} onUpdateStatus={handleUpdateStatus} />} />
+          <Route path="/analise" element={<StartupAnalysisPage startup={currentStartup} pendingStartups={pendingStartups} />} />
+          <Route path="/analise/:id" element={<StartupAnalysisPage pendingStartups={pendingStartups} />} />
           <Route path="/configuracoes" element={<SettingsPage />} />
           <Route path="/privacidade" element={<PrivacyPage />} />
         </Routes>
@@ -298,9 +334,10 @@ function LandingPage() {
           <p>
             Descubra investidores com visão, encontre negócios compatíveis e acelere a próxima etapa da sua jornada.
           </p>
-          <div className="cta-row">
-            <Link to="/signup" className="btn btn-primary">Começar agora</Link>
-            <Link to="/buscar" className="btn btn-ghost">Explorar oportunidades</Link>
+          <div className="cta-row" style={{ flexWrap: 'wrap', gap: '0.75rem' }}>
+            <Link to="/cadastro-startup" className="btn btn-primary">Cadastrar Startup</Link>
+            <Link to="/analise" className="btn btn-secondary">Ver Raio-X com IA</Link>
+            <Link to="/admin" className="btn btn-ghost">Painel de Moderação</Link>
           </div>
           <div className="hero-stats">
             <div>
@@ -985,6 +1022,22 @@ function ProfilePage({ activeRole }: { activeRole: UserRole }) {
                 ? 'Alinhamento forte com investidores que buscam operações escaláveis e impacto em logística e tecnologia.'
                 : 'A startup combina com investidores focados em eficiência, automação e crescimento regional.'}
             </p>
+            <Link
+              to={`/analise/${startup.id}`}
+              className="btn btn-secondary full"
+              style={{
+                borderColor: 'var(--accent, #6366f1)',
+                color: 'var(--accent, #6366f1)',
+                marginBottom: '0.75rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                fontWeight: 600
+              }}
+            >
+              📊 Ver Raio-X & Projeções (IA)
+            </Link>
             <button type="button" className="btn btn-primary full">{activeRole === 'startup' ? 'Demonstrar interesse' : 'Tenho interesse'}</button>
             <Link to="/buscar" className="btn btn-secondary full">Ver mais</Link>
           </div>
