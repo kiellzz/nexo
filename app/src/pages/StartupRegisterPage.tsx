@@ -88,7 +88,7 @@ export function StartupRegisterPage({ onSubmit }: Props) {
               </div>
               <div className="field-group">
                 <label>Segmento de atuação</label>
-                <input value={form.sector} onChange={(e) => update('sector', e.target.value)} placeholder="Ex: Logística IA, FinTech, HealthTech" />
+                <input value={form.sector} onChange={(e) => update('sector', e.target.value)} placeholder="Ex: Logística, FinTech, HealthTech" />
               </div>
             </div>
             <div className="field-grid two-col">

@@ -9,7 +9,7 @@ type Props = {
 
 const statusLabel: Record<ApprovalStatus, string> = {
   pending: 'Pendente',
-  analyzing: 'Em Análise IA',
+  analyzing: 'Em Análise Estatística',
   approved: 'Aprovada',
   rejected: 'Reprovada',
 }
