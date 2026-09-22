@@ -1,4 +1,4 @@
-import { ArrowRight, Info, PlayCircle, TrendingUp } from 'lucide-react'
+import { ArrowRight, Info, TrendingUp } from 'lucide-react'
 import { SegmentIcon } from './SegmentIcon'
 
 interface StartupProfilePreviewProps {
@@ -19,7 +19,6 @@ export function StartupProfilePreview({
   segmentoNome,
   fase,
   descricao,
-  videoPitchUrl,
   valorAlvo,
   valorCaptado,
   percentualEquityOferecido,
@@ -28,7 +27,6 @@ export function StartupProfilePreview({
 }: StartupProfilePreviewProps) {
   const nome = nomeStartup.trim() || 'Nome da startup'
   const segmento = segmentoNome || 'Segmento não selecionado'
-  const videoUrl = videoPitchUrl.trim()
   const meta = Number(valorAlvo)
   const captado = Number(valorCaptado)
   const equity = Number(percentualEquityOferecido)
