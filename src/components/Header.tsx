@@ -8,11 +8,12 @@ import { Brand } from './Brand'
 const focusableSelector = 'a[href], button:not([disabled])'
 
 export function Header() {
-  const { status } = useAuth()
+  const { status, usuario } = useAuth()
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
+  const isHome = window.location.pathname === '/'
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8)
@@ -69,6 +70,7 @@ export function Header() {
         <div className="desktop-actions">
           {isLoggedIn ? (
             <>
+              <span className="user-greeting">Olá, {usuario?.nome || 'bem-vindo(a)'}!</span>
               <a className="button button-navy button-compact" href={accessHref}>Acessar o Nexo</a>
               <button className="button button-ghost button-compact" type="button" onClick={() => void signOut()}>Sair</button>
             </>
@@ -107,6 +109,7 @@ export function Header() {
             <div className="mobile-actions">
               {isLoggedIn ? (
                 <>
+                  <p className="mobile-greeting">Olá, {usuario?.nome || 'bem-vindo(a)'}!</p>
                   <a className="button button-navy" href={accessHref} onClick={close}>Acessar o Nexo</a>
                   <button className="button button-outline" type="button" onClick={() => { close(); void signOut() }}>Sair</button>
                 </>

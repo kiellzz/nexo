@@ -247,7 +247,6 @@ export function AuthPage({ mode, initialRole = 'startup' }: AuthPageProps) {
 function AuthAside() {
   return (
     <aside className="auth-aside" aria-label="Resumo da proposta Nexo">
-      <div className="auth-network" aria-hidden="true" />
       <div className="auth-aside-content">
         <p>{auth.sidePanel.eyebrow}</p>
         <h2>{auth.sidePanel.title}</h2>

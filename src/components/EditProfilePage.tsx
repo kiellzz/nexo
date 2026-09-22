@@ -1,11 +1,20 @@
-import { ArrowRight, Globe, LocateFixed, LogOut, MapPin } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Globe, LocateFixed, LogOut, MapPin } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { z } from 'zod'
 import { signOut } from '../auth/authApi'
 import { useAuth } from '../auth/useAuth'
 import { fasesStartup, tiposInvestidor } from '../data/perfil'
 import { estadosBrasil } from '../data/perfil'
-import { carregarSegmentos, salvarPerfilInvestidor, salvarPerfilStartup, type SegmentoOption } from '../lib/perfilApi'
+import {
+  carregarPerfilInvestidor,
+  carregarPerfilStartup,
+  carregarSegmentos,
+  salvarPerfilInvestidor,
+  salvarPerfilStartup,
+  type InvestidorPerfilData,
+  type SegmentoOption,
+  type StartupPerfilData,
+} from '../lib/perfilApi'
 import { traduzirErroSupabase } from '../lib/supabaseErrors'
 import { mascararCnpj, mascararCpf, somenteDigitos, validarCnpj, validarCpf } from '../utils/documentos'
 import { validarUrlLinkedin, validarUrlWeb, validarUrlYoutube } from '../utils/videos'
@@ -18,8 +27,9 @@ import { InvestorProfilePreview } from './InvestorProfilePreview'
 import { SegmentIcon } from './SegmentIcon'
 import linkedinLogo from '../assets/svg/linkedin-svgrepo-com.svg'
 
-interface OnboardingPageProps {
-  onComplete: () => void
+interface EditProfilePageProps {
+  onCancel: () => void
+  onSave: () => void
 }
 
 const startupSchema = z.object({
@@ -94,6 +104,7 @@ interface InvestidorValues {
   segmentos: number[]
   linkedinUrl: string
 }
+
 type StartupField = keyof StartupValues
 type InvestidorField = keyof InvestidorValues
 
@@ -114,8 +125,8 @@ const startupInitial: StartupValues = {
   siteUrl: '',
   linkedinUrl: '',
   localizacao: '',
-  cidade: '',
-  estado: '',
+    cidade: '',
+    estado: '',
   latitude: null,
   longitude: null,
 }
@@ -131,7 +142,7 @@ const investidorInitial: InvestidorValues = {
   linkedinUrl: '',
 }
 
-export function OnboardingPage({ onComplete }: OnboardingPageProps) {
+export function EditProfilePage({ onCancel, onSave }: EditProfilePageProps) {
   const { usuario, user, refresh } = useAuth()
   const [segmentos, setSegmentos] = useState<SegmentoOption[]>([])
   const [startupValues, setStartupValues] = useState<StartupValues>(startupInitial)
@@ -139,39 +150,95 @@ export function OnboardingPage({ onComplete }: OnboardingPageProps) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [serverError, setServerError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [loadingData, setLoadingData] = useState(true)
   const [locationMessage, setLocationMessage] = useState('')
   const draftReady = useRef(false)
 
   useEffect(() => {
     let active = true
-    void carregarSegmentos()
-      .then((items) => {
+    void Promise.all([carregarSegmentos(), loadProfileData()])
+      .then(([items]) => {
         if (active) setSegmentos(items)
       })
-      .catch(() => {
-        if (active) setServerError('Não foi possível carregar os segmentos. Tente novamente.')
+      .catch((error) => {
+        console.error('Error loading data:', error)
+        if (active) setServerError('Não foi possível carregar os dados. Tente novamente.')
+      })
+      .finally(() => {
+        if (active) setLoadingData(false)
       })
     return () => {
       active = false
     }
-  }, [])
+  }, [usuario, user])
 
   useEffect(() => {
-    if (!user || !usuario) return
-    const startupDraft = carregarRascunho<StartupValues>(user.id, 'startup-onboarding')
-    const investorDraft = carregarRascunho<InvestidorValues>(user.id, 'investidor-onboarding')
+    if (loadingData || !user || !usuario) return
+    const startupDraft = carregarRascunho<StartupValues>(user.id, 'startup-edit')
+    const investorDraft = carregarRascunho<InvestidorValues>(user.id, 'investidor-edit')
     if (startupDraft) setStartupValues((current) => ({ ...current, ...startupDraft }))
     if (investorDraft) setInvestidorValues((current) => ({ ...current, ...investorDraft }))
     draftReady.current = true
-  }, [user, usuario])
+  }, [loadingData, user, usuario])
 
   useEffect(() => {
-    if (!draftReady.current || !user || !usuario) return
-    salvarRascunho(user.id, 'startup-onboarding', startupValues)
-    salvarRascunho(user.id, 'investidor-onboarding', investidorValues)
-  }, [user, usuario, startupValues, investidorValues])
+    if (!draftReady.current || loadingData || !user || !usuario) return
+    salvarRascunho(user.id, 'startup-edit', startupValues)
+    salvarRascunho(user.id, 'investidor-edit', investidorValues)
+  }, [loadingData, user, usuario, startupValues, investidorValues])
 
-  const title = usuario?.tipo === 'startup' ? 'Complete o perfil da sua startup.' : 'Complete seu perfil de investidor.'
+  const loadProfileData = async () => {
+    if (!usuario || !user) return
+
+    try {
+      if (usuario.tipo === 'startup') {
+        const data = await carregarPerfilStartup(user.id)
+        if (data) {
+          setStartupValues({
+            nomeResponsavel: data.nomeResponsavel,
+            nomeStartup: data.nomeStartup,
+            cnpj: mascararCnpj(data.cnpj),
+            fase: data.fase,
+            segmentoId: data.segmentoId,
+            segmentosSecundarios: data.segmentosSecundarios,
+            descricao: data.descricao,
+            videoPitchUrl: data.videoPitchUrl ?? '',
+            dataFundacao: data.dataFundacao?.slice(0, 7) ?? '',
+            siteUrl: data.siteUrl ?? '',
+            linkedinUrl: data.linkedinUrl ?? '',
+            localizacao: data.localizacao ?? '',
+            cidade: data.cidade ?? '',
+            estado: data.estado ?? '',
+            latitude: data.latitude,
+            longitude: data.longitude,
+            valorAlvo: data.rodada?.valorAlvo.toString() ?? '',
+            valorCaptado: data.rodada?.valorCaptado.toString() ?? '',
+            percentualEquityOferecido: data.rodada?.percentualEquityOferecido.toString() ?? '',
+            status: data.rodada?.status ?? 'aberta',
+          })
+        }
+      } else {
+        const data = await carregarPerfilInvestidor(user.id)
+        if (data) {
+          setInvestidorValues({
+            nome: data.nome,
+            cpf: mascararCpf(data.cpf),
+            tipo: data.tipo,
+            biografia: data.biografia,
+            ticketMin: data.ticketMin,
+            ticketMax: data.ticketMax,
+            segmentos: data.segmentos,
+            linkedinUrl: data.linkedinUrl ?? '',
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error)
+      setServerError('Não foi possível carregar seu perfil. Tente novamente.')
+    }
+  }
+
+  const title = usuario?.tipo === 'startup' ? 'Editar perfil da startup.' : 'Editar perfil de investidor.'
 
   const selectedSegmentNames = useMemo(
     () => segmentos.filter((segmento) => investidorValues.segmentos.includes(segmento.id)).map((segmento) => segmento.nome),
@@ -190,6 +257,19 @@ export function OnboardingPage({ onComplete }: OnboardingPageProps) {
               <LogOut size={18} aria-hidden="true" />
               Sair
             </button>
+          </div>
+        </section>
+      </main>
+    )
+  }
+
+  if (loadingData) {
+    return (
+      <main id="conteudo" className="auth-shell">
+        <section className="auth-panel">
+          <div className="auth-card">
+            <Brand />
+            <p>Carregando dados...</p>
           </div>
         </section>
       </main>
@@ -276,8 +356,8 @@ export function OnboardingPage({ onComplete }: OnboardingPageProps) {
         },
       })
       await refresh()
-      limparRascunho(user.id, 'startup-onboarding')
-      onComplete()
+      limparRascunho(user.id, 'startup-edit')
+      onSave()
     } catch (error) {
       setServerError(traduzirErroSupabase(error))
     } finally {
@@ -308,8 +388,8 @@ export function OnboardingPage({ onComplete }: OnboardingPageProps) {
         linkedinUrl: parsed.data.linkedinUrl.trim() || null,
       })
       await refresh()
-      limparRascunho(user.id, 'investidor-onboarding')
-      onComplete()
+      limparRascunho(user.id, 'investidor-edit')
+      onSave()
     } catch (error) {
       setServerError(traduzirErroSupabase(error))
     } finally {
@@ -319,18 +399,24 @@ export function OnboardingPage({ onComplete }: OnboardingPageProps) {
 
   return (
     <main id="conteudo" className="auth-shell">
-      <section className="auth-panel" aria-labelledby="onboarding-title">
+      <section className="auth-panel" aria-labelledby="edit-profile-title">
         <div className="auth-card">
           <div className="auth-top">
             <Brand />
-            <button className="button button-ghost button-compact" type="button" onClick={() => void signOut()}>
-              <LogOut size={17} aria-hidden="true" />
-              Sair
-            </button>
+            <div className="onboarding-actions">
+              <button className="button button-ghost button-compact" type="button" onClick={onCancel}>
+                <ArrowLeft size={17} aria-hidden="true" />
+                Voltar
+              </button>
+              <button className="button button-ghost button-compact" type="button" onClick={() => void signOut()}>
+                <LogOut size={17} aria-hidden="true" />
+                Sair
+              </button>
+            </div>
           </div>
-          <p className="kicker">Onboarding</p>
-          <h1 id="onboarding-title">{title}</h1>
-          <p className="auth-description">Esses dados ajudam o Nexo a preparar seu painel inicial.</p>
+          <p className="kicker">Editar perfil</p>
+          <h1 id="edit-profile-title">{title}</h1>
+          <p className="auth-description">Atualize suas informações abaixo.</p>
 
           {usuario.tipo === 'startup' ? (
             <form className="profile-form" onSubmit={handleStartupSubmit} noValidate>
@@ -521,7 +607,7 @@ export function OnboardingPage({ onComplete }: OnboardingPageProps) {
           )}
         </div>
       </section>
-      <OnboardingAside tipo={usuario.tipo} startupValues={startupValues} investidorValues={investidorValues} segmentos={segmentos} selectedSegmentNames={selectedSegmentNames} />
+      <EditProfileAside tipo={usuario.tipo} startupValues={startupValues} investidorValues={investidorValues} segmentos={segmentos} selectedSegmentNames={selectedSegmentNames} />
     </main>
   )
 }
@@ -541,14 +627,14 @@ function SubmitArea({ loading, error }: { loading: boolean; error: string }) {
     <>
       {error && <p className="form-alert" role="alert">{error}</p>}
       <button className="button button-navy auth-submit" type="submit" disabled={loading}>
-        {loading ? 'Salvando...' : 'Salvar e acessar'}
+        {loading ? 'Salvando...' : 'Salvar alterações'}
         <ArrowRight size={18} aria-hidden="true" />
       </button>
     </>
   )
 }
 
-function OnboardingAside({
+function EditProfileAside({
   tipo,
   startupValues,
   investidorValues,

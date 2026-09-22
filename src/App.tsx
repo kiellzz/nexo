@@ -1,6 +1,8 @@
 import { AudiencePaths } from './components/AudiencePaths'
 import { AppPlaceholder } from './components/AppPlaceholder'
 import { AuthPage } from './components/AuthPage'
+import { EditProfilePage } from './components/EditProfilePage'
+import { ExplorarRodadasPage } from './components/ExplorarRodadasPage'
 import { Faq } from './components/Faq'
 import { FinalCta } from './components/FinalCta'
 import { Footer } from './components/Footer'
@@ -20,6 +22,8 @@ type Route =
   | { page: 'register'; role?: TipoUsuario }
   | { page: 'onboarding' }
   | { page: 'app' }
+  | { page: 'edit-profile' }
+  | { page: 'explorar-rodadas' }
 
 function getTipoFromQuery(search = window.location.search): TipoUsuario | undefined {
   const tipo = new URLSearchParams(search).get('tipo')
@@ -33,6 +37,8 @@ function getRoute(pathname = window.location.pathname, search = window.location.
   if (pathname === '/cadastro') return { page: 'register', role: getTipoFromQuery(search) }
   if (pathname === '/onboarding') return { page: 'onboarding' }
   if (pathname === '/app') return { page: 'app' }
+  if (pathname === '/editar-perfil') return { page: 'edit-profile' }
+  if (pathname === '/explorar-rodadas') return { page: 'explorar-rodadas' }
   return { page: 'home' }
 }
 
@@ -59,7 +65,7 @@ export default function App() {
       const url = new URL(href, window.location.href)
       if (url.origin !== window.location.origin) return
 
-      const isAppRoute = ['/', '/login', '/cadastro', '/cadastro/startup', '/cadastro/investidor', '/onboarding', '/app'].includes(url.pathname)
+      const isAppRoute = ['/', '/login', '/cadastro', '/cadastro/startup', '/cadastro/investidor', '/onboarding', '/app', '/editar-perfil', '/explorar-rodadas'].includes(url.pathname)
       const isSectionLink = url.pathname === '/' && url.hash.length > 0
       if (!isAppRoute && !isSectionLink) return
 
@@ -87,7 +93,7 @@ export default function App() {
     if (status === 'loading') return
 
     const isAuthRoute = route.page === 'login' || route.page === 'register'
-    const isProtectedRoute = route.page === 'app' || route.page === 'onboarding'
+    const isProtectedRoute = route.page === 'app' || route.page === 'onboarding' || route.page === 'edit-profile' || route.page === 'explorar-rodadas'
 
     if (status === 'signedOut' && isProtectedRoute) {
       navigate('/login')
@@ -95,7 +101,7 @@ export default function App() {
     }
 
     if (status === 'needsProfile') {
-      if (route.page !== 'onboarding' && (isAuthRoute || route.page === 'app')) navigate('/onboarding')
+      if (route.page !== 'onboarding' && (isAuthRoute || route.page === 'app' || route.page === 'edit-profile' || route.page === 'explorar-rodadas')) navigate('/onboarding')
       return
     }
 
@@ -129,6 +135,10 @@ export default function App() {
         <AppPlaceholder />
       ) : route.page === 'onboarding' ? (
         <OnboardingPage onComplete={() => navigate('/app')} />
+      ) : route.page === 'edit-profile' ? (
+        <EditProfilePage onCancel={() => navigate('/app')} onSave={() => navigate('/app')} />
+      ) : route.page === 'explorar-rodadas' ? (
+        <ExplorarRodadasPage onBack={() => navigate('/app')} />
       ) : (
         <AuthPage mode={route.page === 'login' ? 'login' : 'register'} initialRole={route.page === 'register' ? route.role : undefined} />
       )}
