@@ -2,3 +2,12 @@
 .env.local
 dist
 node_modules
+.cursor
+
+# Supabase CLI
+supabase/.temp/
+supabase/.branches/
+
+# Documentação da API gerada (versionado: docs/openapi.yaml)
+docs/openapi.html
+redoc-static.html

@@ -1,0 +1,1786 @@
+openapi: 3.1.0
+servers:
+  - url: 'https://{refProjeto}.supabase.co'
+    description: Projeto Supabase do Nexo (GoTrue em /auth/v1, PostgREST em /rest/v1).
+    variables:
+      refProjeto:
+        default: seu-projeto
+        description: Ref/identificador do projeto Supabase.
+info:
+  title: API Nexo
+  version: 1.0.0
+  summary: API do Nexo servida pelo Supabase (Auth + PostgREST) e consumida pelo front React.
+  description: |
+    O Nexo não possui um backend próprio: a API é a do **Supabase**, composta pelo
+    **GoTrue (Auth)** e pelo **PostgREST (banco PostgreSQL + RLS)**. Esta especificação
+    documenta a API **como é consumida pelo front** (`src/auth`, `src/lib/perfilApi.ts`
+    e as páginas), usando caminhos conceituais mapeados para as chamadas reais
+    (`supabase.auth.*` e `supabase.from(...)`), e não os endpoints brutos do Supabase.
+
+    Regras gerais:
+
+    * **Autenticação:** JWT (access token) do Supabase Auth enviado em
+      `Authorization: Bearer <token>`. Exigido em tudo, exceto `POST /auth/signup` e
+      `POST /auth/login`.
+    * **RLS:** todas as tabelas têm Row Level Security; cada usuário só enxerga e
+      altera o que é dono (`auth.uid()`).
+    * **Nomes de propriedades** seguem o banco (português em snake_case quando a
+      coluna tem mais de uma palavra): `nome`, `cnpj`, `cpf`, `fase`, `usuario_id`,
+      `valor_alvo`, `percentual_equity_oferecido`, `ticket_min` etc.
+    * **Mensagens de erro** estão em PT-BR, como exibidas pelo front após o
+      tratamento de erros (`src/lib/supabaseErrors.ts` e `traduzirErroAuth` em
+      `src/auth/authApi.ts`).
+    * **Escopo:** documenta apenas o que está implementado hoje. Não existe criação
+      de proposta/match no front (o botão "Fazer proposta" é um placeholder
+      desabilitado), portanto **não há endpoint de match/proposta**.
+
+    Campos sensíveis (`cpf`, `cnpj`) só são visíveis ao próprio dono do perfil; veja
+    a nota na descrição de cada schema.
+  license:
+    name: Projeto Integrador Senac 2026.2
+    identifier: LicenseRef-Proprietary
+
+tags:
+  - name: Autenticação
+    description: Cadastro, login e logout via Supabase Auth (`src/auth/authApi.ts`).
+  - name: Perfil
+    description: Sessão e perfil do usuário autenticado (`useAuth` / `AuthProvider`).
+  - name: Startups
+    description: CRUD do perfil de startup (onboarding, edição e exclusão com cascata).
+  - name: Investidores
+    description: CRUD do perfil de investidor (onboarding, edição e exclusão com cascata).
+  - name: Catálogo
+    description: Rodadas de captação e segmentos usados pela tela Explorar Rodadas.
+
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/signup:
+    post:
+      operationId: criarConta
+      summary: Cadastra um novo usuário (Supabase Auth signUp)
+      description: |
+        Mapeia `signUp()` de `src/auth/authApi.ts` → `supabase.auth.signUp`.
+
+        Os metadados `tipo` e `nome` são enviados em `options.data` e lidos pelo
+        trigger `public.handle_new_user`, que cria a linha em `usuario`. O link de
+        confirmação de e-mail redireciona para `{origem}/login`.
+
+        O front valida no cliente (Zod): e-mail válido; senha com no mínimo 8
+        caracteres, pelo menos uma letra e pelo menos um número; confirmação de senha
+        igual à senha.
+      tags: [Autenticação]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, senha, tipo]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: E-mail do usuário.
+                  examples: [ana.silva@exemplo.com]
+                senha:
+                  type: string
+                  minLength: 8
+                  pattern: '^(?=.*[A-Za-zÀ-ÿ])(?=.*[0-9]).+$'
+                  description: |
+                    Senha do usuário. Regras do front: mínimo de 8 caracteres,
+                    contendo ao menos uma letra e ao menos um número.
+                  examples: [nexo2026seguro]
+                tipo:
+                  type: string
+                  enum: [startup, investidor]
+                  description: Papel do usuário, gravado em `usuario.tipo` pelo trigger.
+                nome:
+                  type: string
+                  maxLength: 120
+                  description: |
+                    Opcional. Se ausente, o trigger usa a parte local do e-mail.
+                    Ajustado depois no onboarding.
+                  examples: [Ana Silva]
+            examples:
+              startup:
+                summary: Cadastro de startup
+                value:
+                  email: ana.silva@exemplo.com
+                  senha: nexo2026seguro
+                  tipo: startup
+                  nome: Ana Silva
+              investidor:
+                summary: Cadastro de investidor
+                value:
+                  email: roberto.campos@exemplo.com
+                  senha: nexo2026seguro
+                  tipo: investidor
+                  nome: Roberto Campos
+      responses:
+        '200':
+          description: Conta criada. `precisa_confirmar_email` indica se a sessão foi devolvida.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, precisa_confirmar_email]
+                properties:
+                  ok:
+                    type: boolean
+                    examples: [true]
+                  precisa_confirmar_email:
+                    type: boolean
+                    description: |
+                      `true` quando a confirmação de e-mail está ativa no Supabase
+                      (`session === null`): o usuário precisa confirmar antes de entrar.
+                    examples: [true]
+              examples:
+                confirmacaoPendente:
+                  summary: Conta criada, aguardando confirmação de e-mail
+                  value:
+                    ok: true
+                    precisa_confirmar_email: true
+                sessaoImediata:
+                  summary: Conta criada com sessão ativa
+                  value:
+                    ok: true
+                    precisa_confirmar_email: false
+        '400':
+          $ref: '#/components/responses/Erro400'
+        '409':
+          $ref: '#/components/responses/Erro409'
+        '429':
+          $ref: '#/components/responses/Erro429'
+
+  /auth/login:
+    post:
+      operationId: entrar
+      summary: Autentica por e-mail e senha (signInWithPassword)
+      description: |
+        Mapeia `signIn()` de `src/auth/authApi.ts` → `supabase.auth.signInWithPassword`.
+        A sessão (JWT) é persistida pelo cliente Supabase; o front recebe apenas o
+        resultado booleano. Validação no cliente (Zod): e-mail válido e senha não vazia.
+      tags: [Autenticação]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, senha]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  examples: [ana.silva@exemplo.com]
+                senha:
+                  type: string
+                  minLength: 1
+                  examples: [nexo2026seguro]
+            examples:
+              exemplo:
+                summary: Login
+                value:
+                  email: ana.silva@exemplo.com
+                  senha: nexo2026seguro
+      responses:
+        '200':
+          description: Credenciais válidas; sessão estabelecida.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok]
+                properties:
+                  ok:
+                    type: boolean
+                    examples: [true]
+              examples:
+                sucesso:
+                  summary: Login bem-sucedido
+                  value:
+                    ok: true
+        '401':
+          $ref: '#/components/responses/Erro401'
+        '403':
+          $ref: '#/components/responses/Erro403'
+        '429':
+          $ref: '#/components/responses/Erro429'
+
+  /auth/logout:
+    post:
+      operationId: sair
+      summary: Encerra a sessão atual (signOut)
+      description: |
+        Mapeia `signOut()` de `src/auth/authApi.ts` → `supabase.auth.signOut`. O front
+        apenas registra falhas no console (`console.error`), sem mensagem ao usuário;
+        a navegação para `/login` acontece porque `useAuth().status` vira `signedOut`.
+      tags: [Autenticação]
+      responses:
+        '204':
+          description: Sessão encerrada (nenhum conteúdo).
+        '401':
+          $ref: '#/components/responses/Erro401'
+
+  /me:
+    get:
+      operationId: obterPerfilAtual
+      summary: Retorna o usuário autenticado e o status do perfil
+      description: |
+        Mapeia a leitura feita por `AuthProvider.carregarPerfil()`: lê `usuario`
+        (`id`, `nome`, `tipo`, `ativo`) e verifica se existe linha em `startup` ou
+        `investidor` conforme `usuario.tipo` para decidir o status.
+
+        * `ready` – logado e com perfil completo (pode acessar `/app`).
+        * `needsProfile` – logado, mas sem linha de perfil (levado ao `/onboarding`).
+        * `signedOut` – sem sessão (retornado como HTTP 401).
+        * `loading` – estado **transitório apenas do cliente** durante a descoberta da
+          sessão; nunca é retornado por HTTP.
+      tags: [Perfil]
+      responses:
+        '200':
+          description: Sessão ativa. `usuario` é `null` quando não há linha em `usuario`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Me'
+              examples:
+                pronto:
+                  summary: Usuário com perfil completo
+                  value:
+                    status: ready
+                    usuario:
+                      id: 550e8400-e29b-41d4-a716-446655440001
+                      nome: Ana Silva
+                      tipo: startup
+                      ativo: true
+                precisaPerfil:
+                  summary: Logado, mas sem perfil de startup/investidor
+                  value:
+                    status: needsProfile
+                    usuario:
+                      id: 550e8400-e29b-41d4-a716-446655440011
+                      nome: Roberto Campos
+                      tipo: investidor
+                      ativo: true
+        '401':
+          description: |
+            Sem sessão válida. O corpo replica o estado `signedOut` usado pelo front
+            para redirecionar ao `/login`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Me'
+              examples:
+                semSessao:
+                  summary: Sem sessão
+                  value:
+                    status: signedOut
+                    usuario: null
+
+  /startups:
+    post:
+      operationId: criarStartup
+      summary: Cria o perfil de startup (onboarding)
+      description: |
+        Mapeia `salvarPerfilStartup()` de `src/lib/perfilApi.ts`, chamado pela tela de
+        onboarding. A operação faz **várias escritas**:
+
+        1. `upsert` em `startup` com `onConflict: usuario_id` (portanto cria **ou**
+           atualiza o perfil do próprio usuário);
+        2. `insert`/`update` em `captacao` para a rodada (`rodada`), com
+           `data_inicio` igual à data corrente quando é uma inserção;
+        3. `update` em `usuario.nome` com `nome_responsavel`, quando enviado;
+        4. `delete` + `insert` em `startup_segmento` com `segmentos_secundarios`
+           (**substituição total** das linhas da startup).
+
+        Validações do front (Zod) antes do envio: nome do responsável e nome da
+        startup com mínimo de 2 caracteres; CNPJ válido (dígitos verificadores,
+        enviado somente com números); fase no enum; `segmento_id` inteiro positivo;
+        descrição de 10 a 500 caracteres; `video_pitch_url`, `site_url` e
+        `linkedin_url` vazios ou com URL válida (YouTube, web e LinkedIn);
+        `data_fundacao` no formato `AAAA-MM-DD`, não futura e até o mês corrente;
+        `localizacao` até 120 caracteres; `cidade` de 2 a 100 caracteres; `estado`
+        no enum de UF; `valor_alvo` maior que zero; `valor_captado` maior ou igual a
+        zero; `percentual_equity_oferecido` maior que zero e até 49,9; `status` em
+        `aberta`/`encerrada`.
+      tags: [Startups]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartupEscrita'
+            examples:
+              onboarding:
+                summary: Onboarding completo de uma startup
+                value:
+                  usuario_id: 550e8400-e29b-41d4-a716-446655440001
+                  segmento_id: 1
+                  nome: PayFlow
+                  cnpj: '12345678000190'
+                  fase: MVP
+                  descricao: Plataforma de pagamentos B2B para pequenas empresas com automação de conciliação bancária.
+                  video_pitch_url: https://www.youtube.com/watch?v=abc123
+                  data_fundacao: '2019-04-01'
+                  site_url: https://payflow.exemplo.com
+                  localizacao: São Paulo, SP
+                  cidade: São Paulo
+                  estado: SP
+                  latitude: -23.5505
+                  longitude: -46.6333
+                  linkedin_url: https://www.linkedin.com/company/payflow
+                  nome_responsavel: Ana Silva
+                  segmentos_secundarios: [10]
+                  rodada:
+                    valor_alvo: 300000
+                    valor_captado: 120000
+                    percentual_equity_oferecido: 10
+                    status: aberta
+      responses:
+        '201':
+          description: Perfil de startup criado (ou atualizado, por ser upsert).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Startup'
+              examples:
+                criada:
+                  summary: Startup criada
+                  value:
+                    id: 1
+                    usuario_id: 550e8400-e29b-41d4-a716-446655440001
+                    segmento_id: 1
+                    nome: PayFlow
+                    cnpj: '12345678000190'
+                    fase: MVP
+                    descricao: Plataforma de pagamentos B2B para pequenas empresas com automação de conciliação bancária.
+                    video_pitch_url: https://www.youtube.com/watch?v=abc123
+                    data_fundacao: '2019-04-01'
+                    site_url: https://payflow.exemplo.com
+                    localizacao: São Paulo, SP
+                    cidade: São Paulo
+                    estado: SP
+                    latitude: -23.5505
+                    longitude: -46.6333
+                    linkedin_url: https://www.linkedin.com/company/payflow
+                    segmentos_secundarios: [10]
+                    rodada:
+                      id: 1
+                      startup_id: 1
+                      valor_alvo: 300000
+                      valor_captado: 120000
+                      percentual_equity_oferecido: 10
+                      status: aberta
+                      data_inicio: '2026-09-21'
+        '400':
+          $ref: '#/components/responses/Erro400'
+        '401':
+          $ref: '#/components/responses/Erro401'
+        '403':
+          $ref: '#/components/responses/Erro403'
+        '409':
+          $ref: '#/components/responses/Erro409'
+
+  /startups/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Identificador da startup (`startup.id`).
+        schema:
+          type: integer
+          format: int64
+        examples:
+          payflow:
+            value: 1
+    get:
+      operationId: obterStartup
+      summary: Lê o perfil de uma startup
+      description: |
+        Mapeia `carregarPerfilStartup()` de `src/lib/perfilApi.ts`: lê `startup`,
+        a rodada em `captacao` e os `segmentos_secundarios` em `startup_segmento`
+        (o nome do responsável vem de `usuario.nome`).
+
+        Sob RLS, um usuário autenticado só retorna a própria startup; para os
+        demais a resposta é 404.
+      tags: [Startups]
+      responses:
+        '200':
+          description: Perfil encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Startup'
+              examples:
+                encontrada:
+                  summary: Startup com rodada e segmentos secundários
+                  value:
+                    id: 1
+                    usuario_id: 550e8400-e29b-41d4-a716-446655440001
+                    segmento_id: 1
+                    nome: PayFlow
+                    cnpj: '12345678000190'
+                    fase: MVP
+                    descricao: Plataforma de pagamentos B2B para pequenas empresas com automação de conciliação bancária.
+                    video_pitch_url: https://www.youtube.com/watch?v=abc123
+                    data_fundacao: '2019-04-01'
+                    site_url: https://payflow.exemplo.com
+                    localizacao: São Paulo, SP
+                    cidade: São Paulo
+                    estado: SP
+                    latitude: -23.5505
+                    longitude: -46.6333
+                    linkedin_url: https://www.linkedin.com/company/payflow
+                    segmentos_secundarios: [10]
+                    rodada:
+                      id: 1
+                      startup_id: 1
+                      valor_alvo: 300000
+                      valor_captado: 120000
+                      percentual_equity_oferecido: 10
+                      status: aberta
+                      data_inicio: '2026-09-21'
+        '401':
+          $ref: '#/components/responses/Erro401'
+        '403':
+          $ref: '#/components/responses/Erro403'
+        '404':
+          $ref: '#/components/responses/Erro404'
+    put:
+      operationId: atualizarStartup
+      summary: Edita o perfil da startup
+      description: |
+        Mesmo caminho de gravação de `salvarPerfilStartup()` (upsert por
+        `usuario_id`), usado agora pela tela `/editar-perfil`. O front envia o
+        payload completo; campos ausentes são mantidos (não há patch parcial).
+
+        Os relacionamentos são regravados por substituição: `segmentos_secundarios`
+        substitui todas as linhas de `startup_segmento` da startup e `rodada`
+        atualiza a linha de `captacao` correspondente.
+
+        Validações idênticas às de `POST /startups`.
+      tags: [Startups]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartupEscrita'
+            examples:
+              edicao:
+                summary: Edição enviada pela tela de editar perfil
+                value:
+                  usuario_id: 550e8400-e29b-41d4-a716-446655440001
+                  segmento_id: 1
+                  nome: PayFlow
+                  cnpj: '12345678000190'
+                  fase: Tração
+                  descricao: Plataforma de pagamentos B2B para pequenas empresas, agora em expansão nacional.
+                  cidade: São Paulo
+                  estado: SP
+                  nome_responsavel: Ana Silva
+                  segmentos_secundarios: [1, 10]
+                  rodada:
+                    valor_alvo: 800000
+                    valor_captado: 450000
+                    percentual_equity_oferecido: 15
+                    status: aberta
+      responses:
+        '200':
+          description: Perfil atualizado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Startup'
+              examples:
+                atualizada:
+                  summary: Startup atualizada
+                  value:
+                    id: 1
+                    usuario_id: 550e8400-e29b-41d4-a716-446655440001
+                    segmento_id: 1
+                    nome: PayFlow
+                    cnpj: '12345678000190'
+                    fase: Tração
+                    descricao: Plataforma de pagamentos B2B para pequenas empresas, agora em expansão nacional.
+                    cidade: São Paulo
+                    estado: SP
+                    segmentos_secundarios: [1, 10]
+                    rodada:
+                      id: 1
+                      startup_id: 1
+                      valor_alvo: 800000
+                      valor_captado: 450000
+                      percentual_equity_oferecido: 15
+                      status: aberta
+                      data_inicio: '2026-09-21'
+        '400':
+          $ref: '#/components/responses/Erro400'
+        '401':
+          $ref: '#/components/responses/Erro401'
+        '403':
+          $ref: '#/components/responses/Erro403'
+        '404':
+          $ref: '#/components/responses/Erro404'
+        '409':
+          $ref: '#/components/responses/Erro409'
+    delete:
+      operationId: excluirStartup
+      summary: Exclui o perfil de startup (exclusão de perfil, não da conta)
+      description: |
+        Mapeia `excluirPerfilStartup()` de `src/lib/perfilApi.ts`: `delete` em
+        `startup` filtrando por `usuario_id = auth.uid()` do JWT (a chamada real não
+        usa o id do caminho; o path param é o id lógico da startup).
+
+        **Cascata no banco:** apagar a linha de `startup` remove também as suas
+        `captacao` e os `match` em que participava (FK `on delete cascade`). As
+        linhas em `startup_segmento` também caem (FK `on delete cascade`, definida na
+        migration `add_startup_secondary_segments`).
+
+        **A linha em `usuario` não é apagada** e `auth.users` permanece intacto: não
+        é exclusão de conta. Depois da exclusão, `useAuth().status` volta a
+        `needsProfile` e o usuário é levado ao `/onboarding`.
+
+        A operação é idempotente: se não houver linha, responde 204 sem erro.
+      tags: [Startups]
+      responses:
+        '204':
+          description: Perfil de startup excluído (nenhum conteúdo).
+        '401':
+          $ref: '#/components/responses/Erro401'
+        '403':
+          $ref: '#/components/responses/Erro403'
+
+  /investidores:
+    post:
+      operationId: criarInvestidor
+      summary: Cria o perfil de investidor (onboarding)
+      description: |
+        Mapeia `salvarPerfilInvestidor()` de `src/lib/perfilApi.ts`, chamado pela
+        tela de onboarding. Escritas realizadas:
+
+        1. `upsert` em `investidor` com `onConflict: usuario_id`;
+        2. `delete` + `insert` em `investidor_segmento` com `segmentos`
+           (**substituição total** das linhas do investidor);
+        3. `update` em `usuario.nome` com o nome do investidor.
+
+        Validações do front (Zod): nome mínimo de 2 caracteres; CPF válido (dígitos
+        verificadores, enviado somente com números); `tipo` no enum; biografia de 10
+        a 500 caracteres; `ticket_min` maior ou igual a zero; `ticket_max` maior ou
+        igual a zero **e maior ou igual a `ticket_min`**; `segmentos` com pelo menos
+        um item; `linkedin_url` vazio ou URL de LinkedIn válida.
+      tags: [Investidores]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvestidorEscrita'
+            examples:
+              onboarding:
+                summary: Onboarding de um investidor
+                value:
+                  usuario_id: 550e8400-e29b-41d4-a716-446655440011
+                  nome: Roberto Campos
+                  cpf: '12345678901'
+                  tipo: Investidor-anjo
+                  biografia: Empreendedor serial com 15 anos de experiência em tecnologia. Foco em early-stage.
+                  ticket_min: 50000
+                  ticket_max: 200000
+                  linkedin_url: https://www.linkedin.com/in/roberto-campos
+                  segmentos: [1, 3, 10]
+      responses:
+        '201':
+          description: Perfil de investidor criado (ou atualizado, por ser upsert).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Investidor'
+              examples:
+                criado:
+                  summary: Investidor criado
+                  value:
+                    id: 1
+                    usuario_id: 550e8400-e29b-41d4-a716-446655440011
+                    nome: Roberto Campos
+                    cpf: '12345678901'
+                    tipo: Investidor-anjo
+                    biografia: Empreendedor serial com 15 anos de experiência em tecnologia. Foco em early-stage.
+                    ticket_min: 50000
+                    ticket_max: 200000
+                    linkedin_url: https://www.linkedin.com/in/roberto-campos
+                    segmentos: [1, 3, 10]
+        '400':
+          $ref: '#/components/responses/Erro400'
+        '401':
+          $ref: '#/components/responses/Erro401'
+        '403':
+          $ref: '#/components/responses/Erro403'
+        '409':
+          $ref: '#/components/responses/Erro409'
+
+  /investidores/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Identificador do investidor (`investidor.id`).
+        schema:
+          type: integer
+          format: int64
+        examples:
+          roberto:
+            value: 1
+    get:
+      operationId: obterInvestidor
+      summary: Lê o perfil de um investidor
+      description: |
+        Mapeia `carregarPerfilInvestidor()` de `src/lib/perfilApi.ts`: lê `investidor`
+        e os ids em `investidor_segmento`.
+
+        Sob RLS, um usuário autenticado só retorna o próprio investidor; para os
+        demais a resposta é 404.
+      tags: [Investidores]
+      responses:
+        '200':
+          description: Perfil encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Investidor'
+              examples:
+                encontrado:
+                  summary: Investidor com segmentos de interesse
+                  value:
+                    id: 1
+                    usuario_id: 550e8400-e29b-41d4-a716-446655440011
+                    nome: Roberto Campos
+                    cpf: '12345678901'
+                    tipo: Investidor-anjo
+                    biografia: Empreendedor serial com 15 anos de experiência em tecnologia. Foco em early-stage.
+                    ticket_min: 50000
+                    ticket_max: 200000
+                    linkedin_url: https://www.linkedin.com/in/roberto-campos
+                    segmentos: [1, 3, 10]
+        '401':
+          $ref: '#/components/responses/Erro401'
+        '403':
+          $ref: '#/components/responses/Erro403'
+        '404':
+          $ref: '#/components/responses/Erro404'
+    put:
+      operationId: atualizarInvestidor
+      summary: Edita o perfil do investidor
+      description: |
+        Mesmo caminho de `salvarPerfilInvestidor()` (upsert por `usuario_id`),
+        usado pela tela `/editar-perfil`. O front envia o payload completo.
+
+        `segmentos` substitui por completo as linhas de `investidor_segmento`.
+        Validações idênticas às de `POST /investidores`.
+      tags: [Investidores]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvestidorEscrita'
+            examples:
+              edicao:
+                summary: Edição enviada pela tela de editar perfil
+                value:
+                  usuario_id: 550e8400-e29b-41d4-a716-446655440011
+                  nome: Roberto Campos
+                  cpf: '12345678901'
+                  tipo: Fundo de VC
+                  biografia: Investidor com 15 anos de experiência em tecnologia, agora focado em SaaS B2B.
+                  ticket_min: 100000
+                  ticket_max: 500000
+                  linkedin_url: https://www.linkedin.com/in/roberto-campos
+                  segmentos: [1, 10]
+      responses:
+        '200':
+          description: Perfil atualizado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Investidor'
+              examples:
+                atualizado:
+                  summary: Investidor atualizado
+                  value:
+                    id: 1
+                    usuario_id: 550e8400-e29b-41d4-a716-446655440011
+                    nome: Roberto Campos
+                    cpf: '12345678901'
+                    tipo: Fundo de VC
+                    biografia: Investidor com 15 anos de experiência em tecnologia, agora focado em SaaS B2B.
+                    ticket_min: 100000
+                    ticket_max: 500000
+                    linkedin_url: https://www.linkedin.com/in/roberto-campos
+                    segmentos: [1, 10]
+        '400':
+          $ref: '#/components/responses/Erro400'
+        '401':
+          $ref: '#/components/responses/Erro401'
+        '403':
+          $ref: '#/components/responses/Erro403'
+        '404':
+          $ref: '#/components/responses/Erro404'
+        '409':
+          $ref: '#/components/responses/Erro409'
+    delete:
+      operationId: excluirInvestidor
+      summary: Exclui o perfil de investidor (exclusão de perfil, não da conta)
+      description: |
+        Mapeia `excluirPerfilInvestidor()` de `src/lib/perfilApi.ts`: `delete` em
+        `investidor` filtrando por `usuario_id = auth.uid()` do JWT (a chamada real
+        não usa o id do caminho).
+
+        **Cascata no banco:** apagar a linha de `investidor` remove também as suas
+        `investidor_segmento` e os `match` em que participava.
+
+        **A linha em `usuario` não é apagada** e `auth.users` permanece intacto:
+        não é exclusão de conta. Depois da exclusão, `useAuth().status` volta a
+        `needsProfile` e o usuário é levado ao `/onboarding`.
+
+        A operação é idempotente: se não houver linha, responde 204 sem erro.
+      tags: [Investidores]
+      responses:
+        '204':
+          description: Perfil de investidor excluído (nenhum conteúdo).
+        '401':
+          $ref: '#/components/responses/Erro401'
+        '403':
+          $ref: '#/components/responses/Erro403'
+
+  /captacoes:
+    get:
+      operationId: listarCaptacoes
+      summary: Lista rodadas de captação (Explorar Rodadas)
+      description: |
+        Mapeia `carregarRodadasAbertas()` de `src/lib/perfilApi.ts`, usada pela tela
+        `/explorar-rodadas`. A leitura cruza `captacao`, `startup`, `segmento` e
+        `startup_segmento` e devolve cada rodada já com a startup.
+
+        No front, a chamada é feita sem filtro de servidor (traz `status=aberta`) e
+        os recortes são aplicados no cliente; aqui os mesmos filtros estão
+        formalizados como parâmetros de query. A tela é restrita a
+        `usuario.tipo = investidor`.
+
+        Filtros combináveis, aplicados neste ordenação lógica: `busca` no nome da
+        startup, `segmento` no segmento primário, `fase` na fase, faixa de
+        `ticket_min`/`ticket_max` sobre `valor_alvo` e `equity_min` sobre
+        `percentual_equity_oferecido`.
+      tags: [Catálogo]
+      parameters:
+        - name: status
+          in: query
+          required: false
+          description: Status da rodada. Padrão `aberta` (único valor buscado hoje pelo front).
+          schema:
+            type: string
+            enum: [aberta, encerrada]
+            default: aberta
+          examples:
+            aberta:
+              value: aberta
+        - name: busca
+          in: query
+          required: false
+          description: Trecho do nome da startup (sem distinção de maiúsculas/minúsculas).
+          schema:
+            type: string
+            maxLength: 120
+          examples:
+            pay:
+              value: pay
+        - name: segmento
+          in: query
+          required: false
+          description: Nome exato do segmento primário da startup (como exibido no select do front).
+          schema:
+            type: string
+          examples:
+            financas:
+              value: Finanças
+        - name: fase
+          in: query
+          required: false
+          description: Fase da startup.
+          schema:
+            type: string
+            enum: [Ideação, MVP, Tração, Escala]
+          examples:
+            mvp:
+              value: MVP
+        - name: ticket_min
+          in: query
+          required: false
+          description: 'Valor mínimo de `valor_alvo` da rodada (em reais). Padrão da tela: 0.'
+          schema:
+            type: number
+            minimum: 0
+          examples:
+            minimo:
+              value: 0
+        - name: ticket_max
+          in: query
+          required: false
+          description: 'Valor máximo de `valor_alvo` da rodada (em reais). Padrão da tela: 10000000.'
+          schema:
+            type: number
+            minimum: 0
+          examples:
+            maximo:
+              value: 10000000
+        - name: equity_min
+          in: query
+          required: false
+          description: 'Percentual mínimo de equity oferecido, de 0 a 49,9. Padrão da tela: 0.'
+          schema:
+            type: number
+            minimum: 0
+            maximum: 49.9
+          examples:
+            minimo:
+              value: 8
+      responses:
+        '200':
+          description: Lista de rodadas (pode ser vazia).
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RodadaDisponivel'
+              examples:
+                duasRodadas:
+                  summary: Duas rodadas abertas
+                  value:
+                    - id: 1
+                      startup_id: 1
+                      valor_alvo: 300000
+                      valor_captado: 120000
+                      percentual_equity_oferecido: 10
+                      status: aberta
+                      data_inicio: '2026-09-01'
+                      startup:
+                        id: 1
+                        usuario_id: 550e8400-e29b-41d4-a716-446655440001
+                        segmento_id: 1
+                        nome: PayFlow
+                        cnpj: null
+                        fase: MVP
+                        descricao: Plataforma de pagamentos B2B para pequenas empresas com automação de conciliação bancária.
+                        data_fundacao: '2019-04-01'
+                        site_url: https://payflow.exemplo.com
+                        cidade: São Paulo
+                        estado: SP
+                        video_pitch_url: https://www.youtube.com/watch?v=abc123
+                        linkedin_url: https://www.linkedin.com/company/payflow
+                    - id: 2
+                      startup_id: 2
+                      valor_alvo: 800000
+                      valor_captado: 450000
+                      percentual_equity_oferecido: 15
+                      status: aberta
+                      data_inicio: '2026-08-15'
+                      startup:
+                        id: 2
+                        usuario_id: 550e8400-e29b-41d4-a716-446655440002
+                        segmento_id: 2
+                        nome: HealthConnect
+                        cnpj: null
+                        fase: Tração
+                        descricao: Sistema de telemedicina que conecta pacientes a especialistas com IA.
+                        data_fundacao: '2017-08-10'
+                        site_url: https://healthconnect.exemplo.com
+                        cidade: Campinas
+                        estado: SP
+                        video_pitch_url: https://www.youtube.com/watch?v=def456
+                        linkedin_url: https://www.linkedin.com/company/healthconnect
+        '401':
+          $ref: '#/components/responses/Erro401'
+
+  /captacoes/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Identificador da rodada (`captacao.id`).
+        schema:
+          type: integer
+          format: int64
+        examples:
+          payflow:
+            value: 1
+    get:
+      operationId: obterCaptacao
+      summary: Lê uma rodada de captação
+      description: |
+        Leitura pontual de `captacao` com a startup associada. É o dado usado pelo
+        modal de detalhes ("Mais detalhes") da tela Explorar Rodadas.
+      tags: [Catálogo]
+      responses:
+        '200':
+          description: Rodada encontrada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RodadaDisponivel'
+              examples:
+                encontrada:
+                  summary: Rodada da PayFlow
+                  value:
+                    id: 1
+                    startup_id: 1
+                    valor_alvo: 300000
+                    valor_captado: 120000
+                    percentual_equity_oferecido: 10
+                    status: aberta
+                    data_inicio: '2026-09-01'
+                    startup:
+                      id: 1
+                      usuario_id: 550e8400-e29b-41d4-a716-446655440001
+                      segmento_id: 1
+                      nome: PayFlow
+                      cnpj: null
+                      fase: MVP
+                      descricao: Plataforma de pagamentos B2B para pequenas empresas com automação de conciliação bancária.
+                      data_fundacao: '2019-04-01'
+                      site_url: https://payflow.exemplo.com
+                      cidade: São Paulo
+                      estado: SP
+                      video_pitch_url: https://www.youtube.com/watch?v=abc123
+                      linkedin_url: https://www.linkedin.com/company/payflow
+        '401':
+          $ref: '#/components/responses/Erro401'
+        '404':
+          $ref: '#/components/responses/Erro404'
+
+  /segmentos:
+    get:
+      operationId: listarSegmentos
+      summary: Lista os segmentos do catálogo
+      description: |
+        Mapeia `carregarSegmentos()` de `src/lib/perfilApi.ts`: `select id, nome` da
+        tabela `segmento`, ordenado por `nome` ascendente. Alimenta os selects do
+        onboarding, da edição de perfil e o filtro de segmento em Explorar Rodadas.
+      tags: [Catálogo]
+      responses:
+        '200':
+          description: Catálogo de segmentos.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Segmento'
+              examples:
+                catalogo:
+                  summary: Segmentos do catálogo
+                  value:
+                    - id: 1
+                      nome: Finanças
+                    - id: 2
+                      nome: Saúde
+                    - id: 3
+                      nome: Educação
+                    - id: 4
+                      nome: Agricultura
+                    - id: 5
+                      nome: Logística
+                    - id: 6
+                      nome: Energia e sustentabilidade
+                    - id: 7
+                      nome: Alimentação
+                    - id: 8
+                      nome: Varejo
+                    - id: 9
+                      nome: Governo e impacto social
+                    - id: 10
+                      nome: Software e serviços digitais
+        '401':
+          $ref: '#/components/responses/Erro401'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Access token (JWT) emitido pelo Supabase Auth, enviado em
+        `Authorization: Bearer <token>`. Obtido em `POST /auth/login` e renovado
+        automaticamente pelo cliente Supabase.
+
+  parameters: {}
+
+  responses:
+    Erro400:
+      description: |
+        Requisição inválida: falha de validação (Zod) ou violação de constraint do
+        banco. Mensagens em PT-BR como exibidas pelo front.
+
+        Exemplos de gatilhos: campos obrigatórios ausentes, CNPJ/CPF inválidos,
+        descrição fora de 10–500 caracteres, `data_fundacao` futura (trigger
+        `startup_data_fundacao_nao_futura`), equity fora de 0–49,9 (constraint
+        `captacao_equity_oferecido_maximo`), `ticket_max < ticket_min` ou FK
+        violada (código `23503`, "Perfil base não encontrado. Saia e faça um novo
+        cadastro.").
+      headers:
+        Content-Type:
+          schema:
+            type: string
+          examples:
+            json:
+              value: application/json
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Erro'
+          examples:
+            cnpjInvalido:
+              summary: CNPJ inválido (validação do front)
+              value:
+                mensagem: Informe um CNPJ válido.
+                codigo: '22P02'
+                campos:
+                  cnpj: Informe um CNPJ válido.
+            dataFutura:
+              summary: Data de fundação futura (trigger do banco)
+              value:
+                mensagem: A data de fundacao da startup nao pode ser futura.
+                codigo: P0001
+            equityMaximo:
+              summary: Equity acima de 49,9% (constraint)
+              value:
+                mensagem: Não foi possível salvar. Verifique os dados e tente novamente.
+                codigo: '23514'
+            ticketInvertido:
+              summary: Faixa de ticket invertida (refine do Zod)
+              value:
+                mensagem: O valor máximo deve ser maior ou igual ao mínimo.
+                campos:
+                  ticket_max: O valor máximo deve ser maior ou igual ao mínimo.
+    Erro401:
+      description: |
+        Não autenticado: sem JWT ou sessão expirada. O front leva o usuário a
+        `/login` quando `useAuth().status` vira `signedOut`.
+
+        No login, o mesmo código 401 corresponde a `invalid_credentials`
+        ("E-mail ou senha incorretos.").
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Erro'
+          examples:
+            semSessao:
+              summary: Sem sessão
+              value:
+                mensagem: Sessão expirada. Entre novamente.
+                codigo: '401'
+            credenciais:
+              summary: Login com credenciais erradas
+              value:
+                mensagem: E-mail ou senha incorretos.
+                codigo: invalid_credentials
+    Erro403:
+      description: |
+        Sem permissão: violação de RLS (código `42501`) ou tentativa de operar
+        recurso de outro usuário.
+
+        No fluxo de exclusão de perfil, o mesmo código é devolvido quando não há
+        sessão ativa ("Sem permissão. Entre novamente.").
+
+        Também cobre `email_not_confirmed` no login ("Confirme seu e-mail antes de
+        entrar. Verifique sua caixa de entrada.").
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Erro'
+          examples:
+            rls:
+              summary: RLS bloqueou a operação
+              value:
+                mensagem: Sem permissão. Entre novamente.
+                codigo: '42501'
+            emailNaoConfirmado:
+              summary: E-mail ainda não confirmado
+              value:
+                mensagem: Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada.
+                codigo: email_not_confirmed
+    Erro404:
+      description: |
+        Recurso não encontrado ou invisível para o usuário (RLS filtra linhas de
+        outros usuários, então também vira 404).
+
+        No front, a ausência de linha de perfil é tratada com o código PostgREST
+        `PGRST116` e resulta em `null` (sem mensagem); a mensagem abaixo é a
+        representação HTTP equivalente.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Erro'
+          examples:
+            startupAusente:
+              summary: Perfil de startup inexistente
+              value:
+                mensagem: Perfil de startup não encontrado.
+                codigo: PGRST116
+            captacaoAusente:
+              summary: Rodada inexistente
+              value:
+                mensagem: Rodada de captação não encontrada.
+                codigo: PGRST116
+    Erro409:
+      description: |
+        Conflito de unicidade (código `23505`): CNPJ ou CPF já cadastrados, ou
+        e-mail já existente no cadastro.
+
+        No cadastro, o Supabase com "Confirm email" ativo não devolve erro: o front
+        detecta `identities` vazio e responde a mesma mensagem.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Erro'
+          examples:
+            cnpjDuplicado:
+              summary: CNPJ já cadastrado
+              value:
+                mensagem: Este CNPJ já está cadastrado.
+                codigo: '23505'
+            cpfDuplicado:
+              summary: CPF já cadastrado
+              value:
+                mensagem: Este CPF já está cadastrado.
+                codigo: '23505'
+            emailDuplicado:
+              summary: E-mail já cadastrado
+              value:
+                mensagem: Este e-mail já está cadastrado. Tente entrar.
+                codigo: email_exists
+    Erro429:
+      description: |
+        Muitas tentativas: rate limit do Supabase Auth
+        (`over_email_send_rate_limit` / `over_request_rate_limit`).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Erro'
+          examples:
+            limite:
+              summary: Limite de tentativas atingido
+              value:
+                mensagem: Muitas tentativas. Aguarde alguns minutos e tente de novo.
+                codigo: over_request_rate_limit
+
+  schemas:
+    Usuario:
+      type: object
+      description: |
+        Tabela `usuario`: linha base criada pelo trigger `handle_new_user` a partir
+        do cadastro. **Nunca é apagada** pela exclusão de perfil.
+
+        Não contém dados sensíveis (sem CPF/CNPJ/e-mail).
+      required: [id, nome, tipo, ativo]
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Igual a `auth.users.id` e usado como `usuario_id` nos perfis.
+          examples: ['550e8400-e29b-41d4-a716-446655440001']
+        nome:
+          type: string
+          minLength: 2
+          description: Nome do responsável (startup) ou do investidor; atualizado pelo onboarding/edição.
+          examples: [Ana Silva]
+        tipo:
+          type: string
+          enum: [startup, investidor]
+          description: Papel do usuário; define qual tabela de perfil existe (`startup` ou `investidor`).
+        ativo:
+          type: boolean
+          description: Flag de ativação da conta, preenchida como `true` pelo trigger.
+          examples: [true]
+      examples:
+        - id: 550e8400-e29b-41d4-a716-446655440001
+          nome: Ana Silva
+          tipo: startup
+          ativo: true
+
+    Startup:
+      type: object
+      description: |
+        Tabela `startup`: perfil da startup. **Sensível:** `cnpj` só é visível ao
+        próprio dono (`usuario_id = auth.uid()`); nas respostas para outros
+        usuários (ex.: catálogo de rodadas) o campo vem `null` ou ausente.
+
+        Relacionamentos: `segmentos_secundarios` (tabela `startup_segmento`, chave
+        composta `startup_id` + `segmento_id`, FK com `on delete cascade`) e
+        `rodada` (tabela `captacao`, uma linha por startup).
+
+        Restrições do banco: `data_fundacao` não pode ser futura (trigger
+        `startup_data_fundacao_nao_futura`) e `percentual_equity_oferecido` de
+        `captacao` entre 0 (exclusivo) e 49,9 (constraint
+        `captacao_equity_oferecido_maximo`).
+      required: [id, usuario_id, segmento_id, nome, cnpj, fase, descricao]
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Chave primária da startup.
+          examples: [1]
+        usuario_id:
+          type: string
+          format: uuid
+          description: 'Dono do perfil; unicidade garantida (upsert usa `onConflict: usuario_id`).'
+        segmento_id:
+          type: integer
+          format: int64
+          description: Segmento principal (FK para `segmento`).
+          examples: [1]
+        nome:
+          type: string
+          minLength: 2
+          description: Nome fantasia da startup.
+          examples: [PayFlow]
+        cnpj:
+          type: ['string', 'null']
+          pattern: '^[0-9]{14}$'
+          description: |
+            **Campo sensível – somente o dono.** CNPJ somente com números
+            (14 dígitos), validado quanto aos dígitos verificadores no front.
+            Para usuários que não são donos o valor vem `null` (ex.: catálogo de
+            rodadas).
+          examples: ['12345678000190', null]
+        fase:
+          type: string
+          enum: [Ideação, MVP, Tração, Escala]
+          description: Fase da startup.
+        descricao:
+          type: string
+          minLength: 10
+          maxLength: 500
+          description: Texto de apresentação usado no card e no modal de detalhes.
+        video_pitch_url:
+          type: ['string', 'null']
+          description: URL de vídeo do YouTube (validada no front) ou `null`.
+          examples: ['https://www.youtube.com/watch?v=abc123']
+        data_fundacao:
+          type: ['string', 'null']
+          format: date
+          description: Data de fundação; o front envia o dia 1 do mês informado (`AAAA-MM-01`). Não pode ser futura.
+          examples: ['2019-04-01']
+        site_url:
+          type: ['string', 'null']
+          description: Site institucional ou `null`.
+          examples: ['https://payflow.exemplo.com']
+        localizacao:
+          type: ['string', 'null']
+          maxLength: 120
+          description: Rótulo de localização livre (cidade + estado) usado na prévia.
+          examples: ['São Paulo, SP']
+        cidade:
+          type: ['string', 'null']
+          maxLength: 100
+          description: Cidade da sede (preenchida manualmente ou por geolocalização).
+          examples: [São Paulo]
+        estado:
+          type: ['string', 'null']
+          description: UF da sede.
+          enum: [AC, AL, AP, AM, BA, CE, DF, ES, GO, MA, MT, MS, MG, PA, PB, PR, PE, PI, RJ, RN, RS, RO, RR, SC, SP, SE, TO]
+          examples: [SP]
+        latitude:
+          type: ['number', 'null']
+          description: Latitude capturada pela permissão de localização.
+          examples: [-23.5505]
+        longitude:
+          type: ['number', 'null']
+          description: Longitude capturada pela permissão de localização.
+          examples: [-46.6333]
+        linkedin_url:
+          type: ['string', 'null']
+          description: Perfil de LinkedIn da startup ou `null`.
+          examples: ['https://www.linkedin.com/company/payflow']
+        segmentos_secundarios:
+          type: array
+          description: |
+            Segmentos secundários (ids), montados a partir de `startup_segmento`.
+            Na gravação, a lista substitui todas as linhas existentes.
+          items:
+            type: integer
+            format: int64
+          examples:
+            - [10]
+        rodada:
+          description: Rodada de captação da startup (linha em `captacao`), quando existir.
+          oneOf:
+            - $ref: '#/components/schemas/Captacao'
+            - type: 'null'
+      examples:
+        - id: 1
+          usuario_id: 550e8400-e29b-41d4-a716-446655440001
+          segmento_id: 1
+          nome: PayFlow
+          cnpj: '12345678000190'
+          fase: MVP
+          descricao: Plataforma de pagamentos B2B para pequenas empresas com automação de conciliação bancária.
+          video_pitch_url: https://www.youtube.com/watch?v=abc123
+          data_fundacao: '2019-04-01'
+          site_url: https://payflow.exemplo.com
+          localizacao: São Paulo, SP
+          cidade: São Paulo
+          estado: SP
+          latitude: -23.5505
+          longitude: -46.6333
+          linkedin_url: https://www.linkedin.com/company/payflow
+          segmentos_secundarios: [10]
+          rodada:
+            id: 1
+            startup_id: 1
+            valor_alvo: 300000
+            valor_captado: 120000
+            percentual_equity_oferecido: 10
+            status: aberta
+            data_inicio: '2026-09-21'
+
+    StartupEscrita:
+      type: object
+      description: |
+        Payload de criação/edição do perfil de startup (onboarding e
+        `/editar-perfil`). Corresponde ao que `salvarPerfilStartup()` grava: colunas
+        de `startup` + `nome_responsavel` (`usuario.nome`) + `segmentos_secundarios`
+        (`startup_segmento`, substituição total) + `rodada` (`captacao`).
+      required: [usuario_id, segmento_id, nome, cnpj, fase, descricao]
+      properties:
+        usuario_id:
+          type: string
+          format: uuid
+          description: Dono do perfil; precisa ser igual a `auth.uid()` (RLS).
+        segmento_id:
+          type: integer
+          format: int64
+          description: Segmento principal; inteiro positivo.
+          examples: [1]
+        nome:
+          type: string
+          minLength: 2
+          examples: [PayFlow]
+        cnpj:
+          type: string
+          pattern: '^[0-9]{14}$'
+          description: |
+            **Campo sensível – somente o dono.** Enviado somente com números, com
+            dígitos verificadores válidos. Duplicidade gera 409.
+          examples: ['12345678000190']
+        fase:
+          type: string
+          enum: [Ideação, MVP, Tração, Escala]
+        descricao:
+          type: string
+          minLength: 10
+          maxLength: 500
+        video_pitch_url:
+          type: ['string', 'null']
+          description: URL vazia (`''`), `null` ou URL válida de YouTube.
+        data_fundacao:
+          type: ['string', 'null']
+          format: date
+          description: '`AAAA-MM-DD`, até o mês corrente e nunca futura.'
+          examples: ['2019-04-01']
+        site_url:
+          type: ['string', 'null']
+        localizacao:
+          type: ['string', 'null']
+          maxLength: 120
+        cidade:
+          type: string
+          minLength: 2
+          maxLength: 100
+          examples: [São Paulo]
+        estado:
+          type: string
+          enum: [AC, AL, AP, AM, BA, CE, DF, ES, GO, MA, MT, MS, MG, PA, PB, PR, PE, PI, RJ, RN, RS, RO, RR, SC, SP, SE, TO]
+        latitude:
+          type: ['number', 'null']
+        longitude:
+          type: ['number', 'null']
+        linkedin_url:
+          type: ['string', 'null']
+        nome_responsavel:
+          type: string
+          minLength: 2
+          description: Gravado em `usuario.nome` junto com o perfil.
+          examples: [Ana Silva]
+        segmentos_secundarios:
+          type: array
+          description: 'Substitui todas as linhas de `startup_segmento` da startup. Padrão: lista vazia.'
+          items:
+            type: integer
+            format: int64
+          default: []
+          examples:
+            - [10]
+        rodada:
+          $ref: '#/components/schemas/RodadaEscrita'
+      examples:
+        - usuario_id: 550e8400-e29b-41d4-a716-446655440001
+          segmento_id: 1
+          nome: PayFlow
+          cnpj: '12345678000190'
+          fase: MVP
+          descricao: Plataforma de pagamentos B2B para pequenas empresas com automação de conciliação bancária.
+
+    Investidor:
+      type: object
+      description: |
+        Tabela `investidor`: perfil do investidor. **Sensível:** `cpf` só é visível
+        ao próprio dono (`usuario_id = auth.uid()`); nas respostas para outros
+        usuários o campo vem `null` ou ausente.
+
+        Relacionamento: `segmentos` (tabela `investidor_segmento`, ids de
+        `segmento`), substituído por completo na gravação.
+      required: [id, usuario_id, nome, cpf, tipo, biografia, ticket_min, ticket_max]
+      properties:
+        id:
+          type: integer
+          format: int64
+          examples: [1]
+        usuario_id:
+          type: string
+          format: uuid
+          description: 'Dono do perfil; unicidade garantida (upsert usa `onConflict: usuario_id`).'
+        nome:
+          type: string
+          minLength: 2
+          examples: [Roberto Campos]
+        cpf:
+          type: string
+          pattern: '^[0-9]{11}$'
+          description: |
+            **Campo sensível – somente o dono.** CPF somente com números
+            (11 dígitos), validado quanto aos dígitos verificadores no front.
+            Para usuários que não são donos, o valor não é exposto.
+          examples: ['12345678901']
+        tipo:
+          type: string
+          enum: [Investidor-anjo, Fundo de VC, Family office, Corporativo]
+        biografia:
+          type: string
+          minLength: 10
+          maxLength: 500
+        ticket_min:
+          type: number
+          minimum: 0
+          description: Menor investimento aceito (em reais).
+          examples: [50000]
+        ticket_max:
+          type: number
+          minimum: 0
+          description: Maior investimento aceito (em reais); precisa ser maior ou igual a `ticket_min`.
+          examples: [200000]
+        linkedin_url:
+          type: ['string', 'null']
+          examples: ['https://www.linkedin.com/in/roberto-campos']
+        segmentos:
+          type: array
+          minItems: 1
+          description: Segmentos de interesse (ids em `investidor_segmento`); ao menos um.
+          items:
+            type: integer
+            format: int64
+          examples:
+            - [1, 3, 10]
+      examples:
+        - id: 1
+          usuario_id: 550e8400-e29b-41d4-a716-446655440011
+          nome: Roberto Campos
+          cpf: '12345678901'
+          tipo: Investidor-anjo
+          biografia: Empreendedor serial com 15 anos de experiência em tecnologia. Foco em early-stage.
+          ticket_min: 50000
+          ticket_max: 200000
+          linkedin_url: https://www.linkedin.com/in/roberto-campos
+          segmentos: [1, 3, 10]
+
+    InvestidorEscrita:
+      type: object
+      description: |
+        Payload de criação/edição do perfil de investidor (onboarding e
+        `/editar-perfil`). Corresponde ao que `salvarPerfilInvestidor()` grava:
+        colunas de `investidor` + `segmentos` (`investidor_segmento`, substituição
+        total) + `usuario.nome`.
+      required: [usuario_id, nome, cpf, tipo, biografia, ticket_min, ticket_max, segmentos]
+      properties:
+        usuario_id:
+          type: string
+          format: uuid
+          description: Dono do perfil; precisa ser igual a `auth.uid()` (RLS).
+        nome:
+          type: string
+          minLength: 2
+          description: Também gravado em `usuario.nome`.
+          examples: [Roberto Campos]
+        cpf:
+          type: string
+          pattern: '^[0-9]{11}$'
+          description: '**Campo sensível – somente o dono.** Duplicidade gera 409.'
+          examples: ['12345678901']
+        tipo:
+          type: string
+          enum: [Investidor-anjo, Fundo de VC, Family office, Corporativo]
+        biografia:
+          type: string
+          minLength: 10
+          maxLength: 500
+        ticket_min:
+          type: number
+          minimum: 0
+          examples: [50000]
+        ticket_max:
+          type: number
+          minimum: 0
+          description: Precisa ser maior ou igual a `ticket_min`.
+          examples: [200000]
+        linkedin_url:
+          type: ['string', 'null']
+        segmentos:
+          type: array
+          minItems: 1
+          description: Substitui todas as linhas de `investidor_segmento`.
+          items:
+            type: integer
+            format: int64
+          examples:
+            - [1, 3, 10]
+      examples:
+        - usuario_id: 550e8400-e29b-41d4-a716-446655440011
+          nome: Roberto Campos
+          cpf: '12345678901'
+          tipo: Investidor-anjo
+          biografia: Empreendedor serial com 15 anos de experiência em tecnologia. Foco em early-stage.
+          ticket_min: 50000
+          ticket_max: 200000
+          segmentos: [1, 3, 10]
+
+    Segmento:
+      type: object
+      description: 'Tabela `segmento`: catálogo fixo usado por perfis e filtros.'
+      required: [id, nome]
+      properties:
+        id:
+          type: integer
+          format: int64
+          examples: [1]
+        nome:
+          type: string
+          description: Nome exibido (também usado como chave dos ícones por segmento no front).
+          examples: [Finanças]
+      examples:
+        - id: 1
+          nome: Finanças
+
+    Captacao:
+      type: object
+      description: |
+        Tabela `captacao`: rodada de captação de uma startup (uma linha por startup,
+        tratada como upsert no front). É apagada em cascata quando o perfil de
+        startup é excluído.
+
+        Constraint: `percentual_equity_oferecido` maior que 0 e menor ou igual a
+        49,9 (`captacao_equity_oferecido_maximo`).
+      required: [id, startup_id, valor_alvo, valor_captado, percentual_equity_oferecido, status, data_inicio]
+      properties:
+        id:
+          type: integer
+          format: int64
+          examples: [1]
+        startup_id:
+          type: integer
+          format: int64
+          description: FK para `startup` (com `on delete cascade`).
+          examples: [1]
+        valor_alvo:
+          type: number
+          minimum: 0
+          description: Meta de captação em reais.
+          examples: [300000]
+        valor_captado:
+          type: number
+          minimum: 0
+          description: Valor já captado em reais.
+          examples: [120000]
+        percentual_equity_oferecido:
+          type: number
+          exclusiveMinimum: 0
+          maximum: 49.9
+          description: Percentual de equity oferecido na rodada.
+          examples: [10]
+        status:
+          type: string
+          enum: [aberta, encerrada]
+          description: Status da rodada; o catálogo usa apenas `aberta`.
+        data_inicio:
+          type: string
+          format: date
+          description: Data de início da rodada; o front grava a data corrente na inserção.
+          examples: ['2026-09-01']
+      examples:
+        - id: 1
+          startup_id: 1
+          valor_alvo: 300000
+          valor_captado: 120000
+          percentual_equity_oferecido: 10
+          status: aberta
+          data_inicio: '2026-09-01'
+
+    RodadaEscrita:
+      type: object
+      description: |
+        Rodada enviada junto do perfil de startup; gravada em `captacao`
+        (insert ou update por `startup_id`). `data_inicio` é preenchida pelo servidor
+        com a data corrente na inserção.
+      required: [valor_alvo, valor_captado, percentual_equity_oferecido, status]
+      properties:
+        valor_alvo:
+          type: number
+          exclusiveMinimum: 0
+          description: Meta de captação em reais (maior que zero).
+          examples: [300000]
+        valor_captado:
+          type: number
+          minimum: 0
+          examples: [120000]
+        percentual_equity_oferecido:
+          type: number
+          exclusiveMinimum: 0
+          maximum: 49.9
+          examples: [10]
+        status:
+          type: string
+          enum: [aberta, encerrada]
+      examples:
+        - valor_alvo: 300000
+          valor_captado: 120000
+          percentual_equity_oferecido: 10
+          status: aberta
+
+    RodadaDisponivel:
+      type: object
+      description: |
+        Leitura combinada usada em Explorar Rodadas: uma linha de `captacao` com a
+        `startup` correspondente (campos selecionados pelo front: `id`, `nome`,
+        `fase`, `segmento_id`, `descricao`, `data_fundacao`, `site_url`, `cidade`,
+        `estado`, `video_pitch_url`, `linkedin_url`).
+
+        O nome do segmento (`segmento_nome`) e os segmentos secundários são
+        montados no cliente a partir de `GET /segmentos` e `startup_segmento`.
+      required: [id, startup_id, valor_alvo, valor_captado, percentual_equity_oferecido, status, data_inicio, startup]
+      properties:
+        id:
+          type: integer
+          format: int64
+          examples: [1]
+        startup_id:
+          type: integer
+          format: int64
+          examples: [1]
+        valor_alvo:
+          type: number
+          examples: [300000]
+        valor_captado:
+          type: number
+          examples: [120000]
+        percentual_equity_oferecido:
+          type: number
+          examples: [10]
+        status:
+          type: string
+          enum: [aberta, encerrada]
+        data_inicio:
+          type: string
+          format: date
+          examples: ['2026-09-01']
+        startup:
+          $ref: '#/components/schemas/Startup'
+      examples:
+        - id: 1
+          startup_id: 1
+          valor_alvo: 300000
+          valor_captado: 120000
+          percentual_equity_oferecido: 10
+          status: aberta
+          data_inicio: '2026-09-01'
+          startup:
+            id: 1
+            usuario_id: 550e8400-e29b-41d4-a716-446655440001
+            segmento_id: 1
+            nome: PayFlow
+            cnpj: null
+            fase: MVP
+            descricao: Plataforma de pagamentos B2B para pequenas empresas com automação de conciliação bancária.
+            cidade: São Paulo
+            estado: SP
+
+    Me:
+      type: object
+      description: |
+        Resposta de `GET /me`: o usuário autenticado e o status do perfil, os
+        mesmos valores do tipo `AuthStatus` de `src/auth/AuthContext.ts`.
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [loading, signedOut, needsProfile, ready]
+          description: |
+            Estado da autenticação. `loading` existe apenas no cliente (descoberta
+            da sessão) e não é retornado por HTTP; `signedOut` aparece no corpo do
+            401.
+        usuario:
+          description: Linha em `usuario` ou `null` quando não existe/ não é visível.
+          oneOf:
+            - $ref: '#/components/schemas/Usuario'
+            - type: 'null'
+      examples:
+        - status: ready
+          usuario:
+            id: 550e8400-e29b-41d4-a716-446655440001
+            nome: Ana Silva
+            tipo: startup
+            ativo: true
+
+    Erro:
+      type: object
+      description: |
+        Formato padrão de erro. `mensagem` é o texto em PT-BR exibido pelo front
+        depois do tratamento (`traduzirErroSupabase` em `src/lib/supabaseErrors.ts`
+        e `traduzirErroAuth` em `src/auth/authApi.ts`).
+      required: [mensagem]
+      properties:
+        mensagem:
+          type: string
+          description: Mensagem em PT-BR exibida ao usuário.
+          examples: [Não foi possível salvar. Verifique os dados e tente novamente.]
+        codigo:
+          type: string
+          description: |
+            Código bruto do Supabase/PostgREST, quando disponível
+            (ex.: `23505` duplicidade, `23503` FK, `42501` RLS, `PGRST116` nenhuma
+            linha, `invalid_credentials`).
+          examples: ['23505']
+        campos:
+          type: object
+          description: Erros de validação por campo (mensagens do Zod), quando houver.
+          additionalProperties:
+            type: string
+          examples:
+            - { cnpj: Informe um CNPJ válido. }
+      examples:
+        - mensagem: Não foi possível salvar. Verifique os dados e tente novamente.
+          codigo: '23505'

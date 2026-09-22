@@ -31,6 +31,7 @@
 - [Arquitetura e Tecnologias](#-arquitetura-e-tecnologias)
 - [Modelo de Dados](#-modelo-de-dados)
 - [Estrutura do Repositório](#-estrutura-do-repositório)
+- [Documentação da API (OpenAPI)](#-documentação-da-api-openapi)
 - [Governança e Conformidade LGPD](#-governança-e-conformidade-lgpd)
 - [Como Executar o Projeto](#-como-executar-o-projeto)
 - [Equipe](#-equipe)
@@ -81,6 +82,19 @@ O frontend é uma **SPA em React 19 + TypeScript** com roteamento próprio (Hist
 - **Editar perfil** (`/editar-perfil`) para ambos os papéis, reaproveitando o mesmo motor de validação/persistência do onboarding.
 - **Dashboard** (`/app`) com visão geral adaptada ao papel (rodadas/captação para startup; conexões/investimentos/startups para investidor) e ações rápidas.
 - **Prévia de perfil** (`StartupProfilePreview` / `InvestorProfilePreview`) mostrando exatamente como o perfil é exibido para o outro lado.
+
+### Exclusão de Perfil (CRUD — Create, Read, Update, **Delete**)
+- **Entrada:** botão **Excluir perfil** no nav do dashboard (`dashboard-actions` do `AppPlaceholder`), ao lado de *Editar perfil* e *Sair*, de forma **discreta** (só texto/ícone, `button-danger-ghost`, com fundo de alerta apenas no hover) dentro da paleta do projeto. Implementado no componente reutilizável `components/ExcluirPerfil.tsx`.
+- **Confirmação em duas etapas:** o clique abre um diálogo (`role="alertdialog"`) explicando o que será perdido — para startup, *suas rodadas de captação e os matches recebidos*; para investidor, *seus segmentos de interesse e as propostas enviadas* — e exige o checkbox **"Entendo que essa ação não pode ser desfeita"** para habilitar o botão de confirmação.
+- **Persistência:** `excluirPerfilStartup()` e `excluirPerfilInvestidor()` em `lib/perfilApi.ts` apagam a linha em `startup`/`investidor` filtrando por `usuario_id = auth.uid()` atual. Erros passam por `traduzirErroSupabase()` (fallback genérico) e são exibidos **dentro do diálogo**, mantendo o usuário na tela; o botão mostra *Excluindo...* durante a operação.
+- **Cascata do banco (RLS):** apagar `startup` remove também suas `captacao` e `match`; apagar `investidor` remove seus `investidor_segmento` e os `match` em que participava. A linha em `usuario` **não** é apagada.
+- **Pós-exclusão:** `refresh()` do `useAuth()` faz o `status` voltar a `needsProfile`, o que redireciona ao `/onboarding?aviso=perfil-excluido` com a mensagem *"Perfil excluído. Você pode criar um novo perfil quando quiser."* (o parâmetro é removido da URL após a leitura).
+- **Escopo:** é exclusão do **perfil**, não da conta — não há chamadas a `supabase.auth.admin` nem remoção em `auth.users`, e nenhuma exclusão isolada de `captacao` ou `usuario`.
+
+**Roteiro de teste manual:**
+1. Com uma **startup de teste** (com captação e matches), abra o dashboard → *Excluir perfil* → confirme pelo diálogo → caia no `/onboarding` com a mensagem; no banco, some `startup`, `captacao` e `match`, permanecendo `usuario`.
+2. Repita com um **investidor**: some `investidor`, `investidor_segmento` e seus `match`, e o usuário volta ao `/onboarding`.
+3. Cancelar (botão, backdrop ou `Escape`) e checkbox desmarcado não excluem nada; refresh em `/onboarding` não repete a mensagem.
 
 ### Explorar Rodadas (Investidor)
 - Listagem de **rodadas abertas** carregadas do Supabase (tabela `captacao`).
@@ -133,6 +147,8 @@ O roteamento é feito no cliente (History API) em `src/App.tsx`, com proteção 
 
 **Estados de autenticação:** `loading` → `signedOut` → `needsProfile` → `ready`. Rotas protegidas exigem `ready`; usuários sem perfil são enviados ao `/onboarding`.
 
+Após a **exclusão de perfil** pelo nav do dashboard, o usuário cai em `/onboarding?aviso=perfil-excluido` e vê a mensagem *"Perfil excluído. Você pode criar um novo perfil quando quiser."*
+
 ---
 
 ## 🛠 Arquitetura e Tecnologias
@@ -173,7 +189,7 @@ Tabelas principais (Supabase/PostgreSQL):
 | `captacao` | Rodada de captação: `valor_alvo`, `valor_captado`, `percentual_equity_oferecido`, `status`, `data_inicio`. |
 
 Migrations disponíveis em `supabase/migrations/`:
-`video_pitch_url`, `founded_at`, `site_location`, `split_location`, `secondary_segments`, `limit_equity_offer`, `prevent_future_founding_date`, visibilidade de LinkedIn e ajustes de RLS.
+`20260101000000_schema_base` (dump do schema base: as 8 tabelas, os enums `tipo_usuario`/`status_rodada`/`status_match`, índices, constraints e RLS — roda primeiro na reconstrução de um banco novo), `20260101000001_auth_trigger_seed` (função + trigger `handle_new_user` em `auth.users` e seed dos 10 segmentos, idempotentes) e depois as alterações: `video_pitch_url`, `founded_at`, `site_location`, `split_location`, `secondary_segments`, `limit_equity_offer`, `prevent_future_founding_date`, visibilidade de LinkedIn e ajustes de RLS.
 
 ---
 
@@ -189,7 +205,8 @@ nexo/
 │   │   ├── AuthPage.tsx            # Login e cadastro
 │   │   ├── OnboardingPage.tsx      # Onboarding de perfil
 │   │   ├── EditProfilePage.tsx     # Edição de perfil
-│   │   ├── AppPlaceholder.tsx      # Dashboard principal
+│   │   ├── AppPlaceholder.tsx      # Dashboard principal (nav com Editar/Excluir perfil e Sair)
+│   │   ├── ExcluirPerfil.tsx       # Botão + diálogo de confirmação da exclusão de perfil
 │   │   ├── ExplorarRodadasPage.tsx # Catálogo de rodadas + filtros + modal
 │   │   ├── StartupProfilePreview.tsx / InvestorProfilePreview.tsx
 │   │   ├── Hero / HowItWorks / AudiencePaths / Segments / Faq / FinalCta / Header / Footer
@@ -202,11 +219,45 @@ nexo/
 │   ├── App.tsx                 # Roteamento e proteção de rotas
 │   ├── index.css               # Tailwind + design system global
 │   └── main.tsx                # Entrada do React
-├── supabase/migrations/        # Migrations SQL versionadas
+├── docs/
+│   └── openapi.yaml            # Especificação da API (OpenAPI 3.1, PT-BR)
+├── supabase/migrations/        # Migrations SQL versionadas (schema base + trigger/seed + alterações)
 ├── .env.example                # Modelo de variáveis de ambiente
 ├── vite.config.ts
 └── README.md
 ```
+
+---
+
+## 📖 Documentação da API (OpenAPI)
+
+A especificação da API do Nexo está versionada em **`docs/openapi.yaml`** (OpenAPI 3.1, campos e mensagens em PT-BR). Ela documenta **a API que já existe**: o Supabase (GoTrue + PostgREST) consumida pelo front — não há backend próprio. Os caminhos (`/auth/login`, `/startups`, `/captacoes`, `/segmentos`…) são o **mapeamento conceitual** das chamadas reais de `src/auth/authApi.ts` e `src/lib/perfilApi.ts`, não rotas HTTP nossas.
+
+**Validar** (deve passar sem erros):
+
+```bash
+npx @redocly/cli lint docs/openapi.yaml
+```
+
+**Visualizar** (preview local com hot-reload):
+
+```bash
+npx @redocly/cli preview-docs docs/openapi.yaml   # http://localhost:9000
+# porta alternativa: --port 8080
+```
+
+**Gerar HTML estático** (o arquivo gerado fica fora do versionamento — ver `.gitignore`):
+
+```bash
+npx @redocly/cli build-docs docs/openapi.yaml -o docs/openapi.html
+```
+
+**Sem instalar nada:**
+
+* [editor.swagger.io](https://editor.swagger.io) → *File → Import file* → `docs/openapi.yaml`
+* [redocly.com/redoc](https://redocly.com/redoc) → colar o conteúdo do YAML
+
+> ⚠️ O botão **"Try it out"** do Swagger/Redoc não executa chamadas reais: as rotas são um mapeamento conceitual das APIs do Supabase e o campo `servers` usa o placeholder `https://{refProjeto}.supabase.co` (substitua pelo ref do projeto para ilustrar).
 
 ---
 
@@ -222,7 +273,7 @@ O projeto adota princípios de privacidade desde a concepção (*Privacy by Desi
 * **Autenticação:** gerenciada pelo Supabase Auth, com senhas jamais expostas ao cliente e confirmação de e-mail.
 * **Controle de Acesso:** **Row Level Security (RLS)** nas tabelas, garantindo que cada usuário só acesse o que lhe pertence.
 * **Finalidade e Minimização:** coleta estrita dos dados necessários para o matchmaking.
-* **Direitos do Titular:** edição e exclusão dos dados cadastrais via perfil, com base legal documentada.
+* **Direitos do Titular:** edição e exclusão dos dados cadastrais via perfil, com base legal documentada. A **exclusão de perfil** é autoatendida pelo painel (nav do dashboard), com confirmação explícita; a conta de acesso (`auth.users`) é mantida.
 
 ---
 
