@@ -22,6 +22,20 @@ interface OnboardingPageProps {
   onComplete: () => void
 }
 
+/**
+ * Mensagem exibida ao chegar aqui, por exemplo após a exclusão do perfil
+ * (/onboarding?aviso=perfil-excluido). O parâmetro é removido da URL para
+ * que a mensagem não reapareça em um refresh da página.
+ */
+function lerAvisoInicial(): string {
+  const params = new URLSearchParams(window.location.search)
+  if (params.get('aviso') !== 'perfil-excluido') return ''
+  params.delete('aviso')
+  const query = params.toString()
+  window.history.replaceState({}, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`)
+  return 'Perfil excluído. Você pode criar um novo perfil quando quiser.'
+}
+
 const startupSchema = z.object({
   nomeResponsavel: z.string().trim().min(2, 'Informe o nome do responsável.'),
   nomeStartup: z.string().trim().min(2, 'Informe o nome da startup.'),
@@ -140,6 +154,7 @@ export function OnboardingPage({ onComplete }: OnboardingPageProps) {
   const [serverError, setServerError] = useState('')
   const [loading, setLoading] = useState(false)
   const [locationMessage, setLocationMessage] = useState('')
+  const [avisoInicial] = useState(lerAvisoInicial)
   const draftReady = useRef(false)
 
   useEffect(() => {
@@ -331,6 +346,7 @@ export function OnboardingPage({ onComplete }: OnboardingPageProps) {
           <p className="kicker">Onboarding</p>
           <h1 id="onboarding-title">{title}</h1>
           <p className="auth-description">Esses dados ajudam o Nexo a preparar seu painel inicial.</p>
+          {avisoInicial && <p className="form-alert" role="status">{avisoInicial}</p>}
 
           {usuario.tipo === 'startup' ? (
             <form className="profile-form" onSubmit={handleStartupSubmit} noValidate>

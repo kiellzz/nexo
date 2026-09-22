@@ -343,6 +343,23 @@ footer nav { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 14p
 .form-error { color: #A4343A; font-size: .78rem; font-weight: 650; }
 .form-alert { margin: 0; border: 1px solid #F1C4C8; border-radius: 12px; padding: 12px 14px; background: #FFF1F2; color: #8A252B; font-size: .88rem; line-height: 1.45; }
 
+/* Zona de risco — exclusão de perfil */
+.button-danger { border: 1px solid #E5A1A8; background: #FFF1F2; color: #8A252B; }
+.button-danger:hover { border-color: #D9737E; background: #FFE6E9; }
+/* Entrada discreta no nav do dashboard: só texto/ícone, tom de alerta só no hover */
+.button-danger-ghost { border-color: transparent; background: transparent; color: #A4343A; font-weight: 650; }
+.button-danger-ghost:hover { border-color: #F1C4C8; background: #FFF1F2; }
+
+.confirm-modal { position: relative; width: min(100%, 470px); border: 1px solid #F1C4C8; border-radius: 22px; padding: 30px; background: #FFFFFF; box-shadow: 0 28px 80px rgb(3 28 55 / .28); }
+.confirm-modal h2 { margin: 8px 0 12px; padding-right: 42px; color: #062B52; font-family: var(--font-display); font-size: 1.5rem; letter-spacing: -.03em; line-height: 1.15; }
+.confirm-modal .kicker { color: #8A252B; }
+.confirm-modal p { margin: 0 0 12px; color: #41586B; font-size: .92rem; line-height: 1.65; }
+.confirm-modal-loss { border: 1px solid #F1C4C8; border-radius: 12px; padding: 12px 14px; background: #FFF1F2; color: #8A252B; }
+.confirm-modal .form-alert { margin-top: 14px; }
+.confirm-modal-check { display: flex; align-items: flex-start; gap: 10px; margin-top: 14px; color: #34495E; font-size: .88rem; font-weight: 650; cursor: pointer; }
+.confirm-modal-check input { width: 18px; height: 18px; margin-top: 1px; accent-color: #A4343A; }
+.confirm-modal-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; margin-top: 22px; border-top: 1px solid #F1E3E5; padding-top: 18px; }
+
 .role-fieldset { min-width: 0; margin: 0; border: 0; padding: 0; }
 .role-fieldset legend { margin-bottom: 10px; color: #34495E; font-size: .88rem; font-weight: 750; }
 .role-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }

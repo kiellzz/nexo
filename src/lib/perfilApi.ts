@@ -227,6 +227,30 @@ export async function salvarPerfilInvestidor(input: InvestidorPerfilInput): Prom
   if (usuarioError) throw usuarioError
 }
 
+/**
+ * Exclusão de PERFIL (não da conta): apaga apenas a linha em "startup" ou
+ * "investidor" do usuário autenticado. A linha em "usuario" permanece e o
+ * cascade do banco remove as captações/matches ligados a esse perfil.
+ */
+async function usuarioAtualId(): Promise<string> {
+  const { data, error } = await supabase.auth.getUser()
+  if (error) throw error
+  if (!data.user) throw { code: '42501', message: 'Sessão expirada. Entre novamente.' }
+  return data.user.id
+}
+
+export async function excluirPerfilStartup(): Promise<void> {
+  const usuarioId = await usuarioAtualId()
+  const { error } = await supabase.from('startup').delete().eq('usuario_id', usuarioId)
+  if (error) throw error
+}
+
+export async function excluirPerfilInvestidor(): Promise<void> {
+  const usuarioId = await usuarioAtualId()
+  const { error } = await supabase.from('investidor').delete().eq('usuario_id', usuarioId)
+  if (error) throw error
+}
+
 export interface StartupPerfilData {
   nomeResponsavel: string
   nomeStartup: string

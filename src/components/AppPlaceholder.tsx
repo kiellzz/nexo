@@ -2,8 +2,14 @@ import { Building2, Briefcase, LogOut, Settings, TrendingUp, Users } from 'lucid
 import { signOut } from '../auth/authApi'
 import { useAuth } from '../auth/useAuth'
 import { Brand } from './Brand'
+import { ExcluirPerfilButton } from './ExcluirPerfil'
 
-export function AppPlaceholder() {
+interface AppPlaceholderProps {
+  /** Chamado após a exclusão do perfil com sucesso (leva o usuário ao /onboarding). */
+  onExcluido: () => void
+}
+
+export function AppPlaceholder({ onExcluido }: AppPlaceholderProps) {
   const { usuario } = useAuth()
   const isStartup = usuario?.tipo === 'startup'
 
@@ -23,6 +29,7 @@ export function AppPlaceholder() {
               <Settings size={18} aria-hidden="true" />
               <span>Editar perfil</span>
             </a>
+            <ExcluirPerfilButton onExcluido={onExcluido} />
             <button className="button button-outline button-compact" type="button" onClick={() => void signOut()}>
               <LogOut size={18} aria-hidden="true" />
               <span>Sair</span>

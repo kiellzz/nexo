@@ -132,7 +132,7 @@ export default function App() {
           <Footer />
         </>
       ) : route.page === 'app' ? (
-        <AppPlaceholder />
+        <AppPlaceholder onExcluido={() => navigate('/onboarding?aviso=perfil-excluido')} />
       ) : route.page === 'onboarding' ? (
         <OnboardingPage onComplete={() => navigate('/app')} />
       ) : route.page === 'edit-profile' ? (
