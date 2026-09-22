@@ -1,9 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
 :root {
-  font-family: 'Plus Jakarta Sans', Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.6;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
   font-weight: 400;
-  color: #f1f5f9;
-  background: #090d16;
+  color: #FAFAFA;
+  background-color: #09090B;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -21,15 +23,16 @@ html {
 body {
   margin: 0;
   min-width: 320px;
-  background: #090d16;
-  color: #f1f5f9;
+  background-color: #09090B;
+  color: #FAFAFA;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 button,
 input,
 textarea,
 select {
-  font: inherit;
+  font-family: inherit;
 }
 
 img {
@@ -43,6 +46,7 @@ img {
 
 a {
   color: inherit;
+  text-decoration: none;
 }
 
 h1,

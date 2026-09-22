@@ -510,3 +510,4 @@ export function NegotiationsPage({ activeRole }: NegotiationsPageProps) {
     </div>
   )
 }
+
