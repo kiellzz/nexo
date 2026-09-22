@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="nexo_logo.png" alt="Nexo Logo" width="160" />
+  <img src="src/assets/logo.png" alt="Nexo Logo" width="160" />
 </p>
 
 <h1 align="center">NEXO</h1>
@@ -10,16 +10,13 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Frontend-Concluído%20(React%2019)-brightgreen?style=for-the-badge&logo=react&logoColor=black" alt="Frontend" />
-  <img src="https://img.shields.io/badge/Backend%20API-Em%20Desenvolvimento-orange?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Backend" />
-  <img src="https://img.shields.io/badge/Banco%20de%20Dados-Em%20Estruturação-yellow?style=for-the-badge" alt="Banco de Dados" />
-  <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/Vite-6.x-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
+  <img src="https://img.shields.io/badge/Frontend-React%2019-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 19" />
+  <img src="https://img.shields.io/badge/TypeScript-5.7-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript 5.7" />
+  <img src="https://img.shields.io/badge/Vite-6.x-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite 6" />
+  <img src="https://img.shields.io/badge/Supabase-Auth%20%2B%20Postgres-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" />
+  <img src="https://img.shields.io/badge/Tailwind%20CSS-4.x-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS 4" />
+  <img src="https://img.shields.io/badge/Zod-4.x-3068B7?style=for-the-badge&logo=zod&logoColor=white" alt="Zod 4" />
   <img src="https://img.shields.io/badge/LGPD-Planejada-blue?style=for-the-badge" alt="LGPD" />
-  <a href="https://trello.com/b/H6sAjFhC/pi-nexo" target="_blank">
-    <img src="https://img.shields.io/badge/Trello-PI_Nexo-0052CC?style=for-the-badge&logo=trello&logoColor=white" alt="Quadro do Trello" />
-  </a>
-</p>
 </p>
 
 ---
@@ -28,12 +25,13 @@
 
 - [Visão Geral](#-visão-geral)
 - [Proposta de Valor e Público-Alvo](#-proposta-de-valor-e-público-alvo)
-- [Status de Desenvolvimento do MVP](#-status-de-desenvolvimento-do-mvp)
+- [Funcionalidades Atuais](#-funcionalidades-atuais)
 - [Fluxo Principal da Solução](#-fluxo-principal-da-solução)
+- [Rotas da Aplicação](#-rotas-da-aplicação)
 - [Arquitetura e Tecnologias](#-arquitetura-e-tecnologias)
-- [Business Model Canvas Inicial](#-business-model-canvas-inicial)
+- [Modelo de Dados](#-modelo-de-dados)
+- [Estrutura do Repositório](#-estrutura-do-repositório)
 - [Governança e Conformidade LGPD](#-governança-e-conformidade-lgpd)
-- [Estrutura Atual do Repositório](#-estrutura-atual-do-repositório)
 - [Como Executar o Projeto](#-como-executar-o-projeto)
 - [Equipe](#-equipe)
 
@@ -41,102 +39,173 @@
 
 ## 💡 Visão Geral
 
-O **NEXO** é uma plataforma web responsiva e PWA projetada para conectar e aproximar **startups em busca de captação e crescimento** a **investidores com teses alinhadas**.
+O **NEXO** é uma plataforma web responsiva que conecta **startups em busca de captação** a **investidores com teses alinhadas**.
 
-Por meio de perfis estruturados, filtros detalhados e mecanismos de correspondência inteligente (*matchmaking*), a plataforma reduz o atrito e o tempo de busca no ecossistema de inovação, proporcionando conexões assertivas e qualificadas.
+Por meio de perfis estruturados (segmento, fase, ticket, localização, links e vídeo de pitch), filtros avançados e um catálogo de rodadas abertas, a plataforma reduz o atrito e o tempo de busca no ecossistema de inovação.
+
+O frontend é uma **SPA em React 19 + TypeScript** com roteamento próprio (History API), e a persistência **já está integrada ao Supabase** (autenticação + banco PostgreSQL), substituindo os dados simulados das primeiras entregas.
 
 ---
 
 ## 🎯 Proposta de Valor e Público-Alvo
 
 ### Proposta de Valor
-* **Para Startups:** Visibilidade qualificada para investidores-anjo e fundos, apresentação padronizada de métricas e redução do tempo de captação.
-* **Para Investidores:** Curadoria e filtragem de dealflow com base em critérios de tese, estágio de maturidade, segmento e ticket médio.
+* **Para Startups:** Visibilidade qualificada para investidores-anjo e fundos, apresentação padronizada de métricas (rodada, equity, fase) e redução do tempo de captação.
+* **Para Investidores:** Curadoria e filtragem de *dealflow* por segmento (principal e secundários), fase, faixa de ticket e equity mínimo.
 
 ### Público-Alvo
-1. **Startups & Empreendedores:** Negócios em fases de validação, MVP, tração ou escala em busca de investimento inteligente (*smart money*).
-2. **Investidores & Fundos:** Investidores-anjo, sindicatos de investimento, aceleradoras e fundos de *Venture Capital (VC)*.
+1. **Startups & Empreendedores:** negócios em fases de *Ideação, MVP, Tração ou Escala* em busca de *smart money*.
+2. **Investidores & Fundos:** investidores-anjo, *family offices*, corporativos e fundos de *Venture Capital (VC)*.
 
 ---
 
-## 🚀 Status de Desenvolvimento do MVP (1ª Entrega)
+## ✅ Funcionalidades Atuais
 
-| Módulo / Requisito | Status Atual | Detalhes |
-| :--- | :---: | :--- |
-| **Interface Web Responsiva / PWA** | `Concluído` | Interface moderna em React 19 + TypeScript rodando com Vite |
-| **Autenticação & Perfis (Startup / Investidor)** | `Concluído (UI)` | Telas e alternância de papéis implementadas no frontend |
-| **Catálogo de Startups & Investidores** | `Concluído (UI)` | Visualização de cards, métricas e teses com dados simulados |
-| **Mecanismo de Filtros & Oportunidades** | `Concluído (UI)` | Filtros dinâmicos por segmento, ticket e estágio no frontend |
-| **Fluxo de Matchmaking & Interesse** | `Concluído (UI)` | Simulação visual de registro de interesse e status de match |
-| **Dashboard de Oportunidades** | `Concluído (UI)` | Painéis e métricas renderizados no cliente |
-| **Backend REST API (Node.js)** | `Em Desenvolvimento` | Estruturação dos serviços e endpoints REST |
-| **Banco de Dados Integrado** | `Em Desenvolvimento` | Modelagem e integração do banco de dados persistente |
+### Landing Page
+- **Hero** com vídeo de destaque e cartão de prévia de rodada.
+- **Como funciona** (jornada em 3 passos), **Trilhas por público** (startup/investidor), **Segmentos** suportados, **FAQ** e **CTA final**.
+- Cabeçalho responsivo com navegação e menu mobile.
+
+### Autenticação (Supabase Auth)
+- **Cadastro** e **Login** por e-mail/senha, com seleção de papel (**Startup** ou **Investidor**) no cadastro.
+- Confirmação de e-mail, tradução de erros de autenticação para PT-BR e *redirect* para `/login` após confirmação.
+- Sessão persistida e reidratada automaticamente; eventos de `onAuthStateChange` sincronizados.
+
+### Onboarding
+- Formulário de perfil específico por papel, com validação via **Zod**:
+  - **Startup:** responsável, nome, **CNPJ** (validação de dígitos verificadores), fase, segmento principal, **segmentos secundários (opcional)**, descrição, vídeo de pitch (URL do YouTube), fundação, site, LinkedIn, **localização por geolocalização** (cidade/estado) e **rodada de captação** (meta, captado, equity, status).
+  - **Investidor:** nome, **CPF** (validação), tipo, biografia, faixa de ticket (mín./máx.) e segmentos de interesse.
+- **Rascunho automático** dos formulários em `localStorage` (por usuário e tipo).
+
+### Perfil & Dashboard
+- **Editar perfil** (`/editar-perfil`) para ambos os papéis, reaproveitando o mesmo motor de validação/persistência do onboarding.
+- **Dashboard** (`/app`) com visão geral adaptada ao papel (rodadas/captação para startup; conexões/investimentos/startups para investidor) e ações rápidas.
+- **Prévia de perfil** (`StartupProfilePreview` / `InvestorProfilePreview`) mostrando exatamente como o perfil é exibido para o outro lado.
+
+### Explorar Rodadas (Investidor)
+- Listagem de **rodadas abertas** carregadas do Supabase (tabela `captacao`).
+- **Filtros avançados** em painel dedicado: busca por nome, segmento, fase, faixa de ticket (RangeSlider) e equity mínimo, com botão **Limpar filtros** que se habilita só quando há filtro ativo.
+- **Cards de oportunidade** padronizados (segmento com ícone, fase, status, meta, equity, progresso e match).
+- **Modal de detalhes** com sobre a startup, **segmentos secundários** (com ícones), informações adicionais (localização, site, LinkedIn) e **vídeo de pitch** (embed do YouTube).
+
+### Utilidades transversais
+- Validação e máscara de **CPF/CNPJ** (`utils/documentos.ts`).
+- Validação de **URLs** (YouTube, site e LinkedIn) (`utils/videos.ts`).
+- **Geocodificação reversa** via Nominatim/OpenStreetMap para preencher cidade/estado (`utils/localizacao.ts`).
+- **Ícones por segmento** (`SegmentIcon`), **RangeSlider** acessível e componentes de UI reutilizáveis.
 
 ---
 
 ## 🔄 Fluxo Principal da Solução
 
-O fluxo da plataforma contempla toda a jornada do usuário, desde a entrada até a conexão mútua:
-
 ```mermaid
-flowchart LR
-    A["Cadastro / Login"] --> B{"Tipo de Perfil"}
-    B -->|Startup| C["Perfil da Startup & Investimento"]
-    B -->|Investidor| D["Tese & Faixa de Aporte"]
-    C --> E["Busca & Descoberta"]
+flowchart TD
+    A["Cadastro / Login (Supabase Auth)"] --> B{"Tipo de Perfil"}
+    B -->|Startup| C["Onboarding: perfil + rodada de captação"]
+    B -->|Investidor| D["Onboarding: tese, ticket e segmentos"]
+    C --> E["Dashboard (/app)"]
     D --> E
-    E --> F["Filtros & Recomendação"]
-    F --> G["Identificação de Oportunidades"]
-    G --> H["Manifestação de Interesse"]
-    H --> I{"Match Confirmado?"}
-    I -->|Sim| J["Dashboard de Conexões & Contato"]
-    I -->|Pendente| K["Acompanhamento no Dashboard"]
+    E -->|Investidor| F["Explorar Rodadas (/explorar-rodadas)"]
+    F --> G["Filtros avançados (segmento, fase, ticket, equity)"]
+    G --> H["Card de oportunidade"]
+    H --> I["Modal de detalhes (métricas, links, pitch)"]
+    E -->|Ambos| J["Editar perfil (/editar-perfil)"]
+    J --> E
 ```
+
+---
+
+## 🧭 Rotas da Aplicação
+
+O roteamento é feito no cliente (History API) em `src/App.tsx`, com proteção de rotas por status de autenticação.
+
+| Rota | Página | Acesso |
+| :--- | :--- | :--- |
+| `/` | Landing page | Público |
+| `/login` | Login | Público (redireciona se já logado) |
+| `/cadastro` | Cadastro (papel via `?tipo=`) | Público |
+| `/cadastro/startup` | Cadastro de Startup | Público |
+| `/cadastro/investidor` | Cadastro de Investidor | Público |
+| `/onboarding` | Onboarding de perfil | Autenticado (sem perfil) |
+| `/app` | Dashboard | Autenticado |
+| `/editar-perfil` | Editar perfil | Autenticado |
+| `/explorar-rodadas` | Explorar rodadas | Autenticado (investidor) |
+
+**Estados de autenticação:** `loading` → `signedOut` → `needsProfile` → `ready`. Rotas protegidas exigem `ready`; usuários sem perfil são enviados ao `/onboarding`.
 
 ---
 
 ## 🛠 Arquitetura e Tecnologias
 
-A arquitetura do projeto foi desenhada seguindo o modelo **cliente-servidor desacoplado**:
-
 ```mermaid
-flowchart TD
-    Client["Frontend SPA / PWA (React 19 + TypeScript + Vite)"]
-    API["Backend REST API (Node.js - Em Desenvolvimento)"]
-    DB[("Banco de Dados Integrado (Em Desenvolvimento)")]
-    IA["Módulo de Matchmaking / Filtros Inteligentes"]
+flowchart LR
+    Client["SPA React 19 + TypeScript + Vite"]
+    Auth["Supabase Auth (e-mail/senha)"]
+    DB[("PostgreSQL (Supabase)")]
 
-    Client <-->|"HTTP / REST"| API
-    API <-->|"Persistência / Queries"| DB
-    API <-->|"Processamento de Score"| IA
+    Client -->|"Session / JWT"| Auth
+    Client -->|"supabase-js"| DB
 ```
 
 ### Stack Tecnológica
-* **Frontend:** [React 19](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite](https://vite.dev/), PWA e CSS moderno.
-* **Backend (em construção):** [Node.js](https://nodejs.org/), API RESTful com arquitetura desacoplada.
-* **Linter & Qualidade de Código:** [Oxlint](https://oxc-project.github.io/), Git e GitHub.
+* **Frontend:** [React 19](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite 6](https://vite.dev/), [Tailwind CSS 4](https://tailwindcss.com/) + CSS customizado.
+* **Backend/BaaS:** [Supabase](https://supabase.com/) (Auth + PostgreSQL + RLS), consumo via `@supabase/supabase-js`.
+* **Validação:** [Zod 4](https://zod.dev/) nos formulários de perfil.
+* **Ícones:** [lucide-react](https://lucide.dev/) + SVGs próprios.
+* **Tipografia:** `@fontsource-variable` (Inter e Plus Jakarta Sans).
+* **Seed de dados:** `@faker-js/faker` + script `src/seed.ts` (executado com `tsx`).
+* **Migrations:** SQL versionado em `supabase/migrations/`.
 
 ---
 
-## 📊 Business Model Canvas Inicial
+## 🗄 Modelo de Dados
 
-```
-┌────────────────────────┬────────────────────────┬────────────────────────┬────────────────────────┬────────────────────────┐
-│ PARCERIAS-CHAVE        │ ATIVIDADES-CHAVE       │ PROPOSTA DE VALOR      │ RELACIONAMENTO         │ SEGMENTOS DE CLIENTES  │
-│ • Aceleradoras e Hubs  │ • Desenvolvimento contínuo│ • Matchmaking ágil e │ • Suporte na plataforma│ • Startups (Early/     │
-│   de Inovação          │   do algoritmo de match│   assertivo baseado em │ • Transparência de     │   Growth Stage)        │
-│ • Faculdades e Polos   │ • Moderação de perfis e│   dados estruturados   │   métricas e feedbacks │ • Investidores-anjo,   │
-│ • Associações de Anjos │   curadoria de dados   │ • Redução de ruído na  │                        │   Family Offices e     │
-│                        │ • Segurança e LGPD     │   busca por capital    │ CANAIS                 │   Fundos de VC         │
-├────────────────────────┼────────────────────────┤                        ├────────────────────────┤                        │
-│ RECURSOS-CHAVE         │                        │                        │ • Plataforma Web e PWA │                        │
-│ • Plataforma Tecnológica                        │                        │ • Parcerias com Polos  │                        │
-│ • Base de dados de startups e investidores     │                        │   Tecnológicos         │                        │
-├────────────────────────┴────────────────────────┴────────────────────────┴────────────────────────┴────────────────────────┤
-│ ESTRUTURA DE CUSTOS                                                      │ FONTES DE RECEITA                                      │
-│ • Infraestrutura de nuvem, servidores e banco de dados                   │ • Modelo Freemium com planos Premium para destaque     │
-│ • Desenvolvimento, manutenção e segurança da informação                 │ • Taxa de sucesso / Conexões avançadas de dealflow     │
-└──────────────────────────────────────────────────────────────────────────┴────────────────────────────────────────────────────────┘
+Tabelas principais (Supabase/PostgreSQL):
+
+| Tabela | Descrição |
+| :--- | :--- |
+| `usuario` | Usuário base (nome, tipo `startup`/`investidor`, ativo). Populado pelo trigger `handle_new_user`. |
+| `startup` | Perfil da startup: segmento principal, CNPJ, fase, descrição, vídeo de pitch, fundação, site, LinkedIn, cidade/estado e coordenadas. |
+| `investidor` | Perfil do investidor: CPF, tipo, biografia, `ticket_min`, `ticket_max` e LinkedIn. |
+| `segmento` | Catálogo de segmentos (Finanças, Saúde, Educação, etc.). |
+| `startup_segmento` | **Segmentos secundários** de uma startup (N:N, além do segmento principal). |
+| `investidor_segmento` | Segmentos de interesse de um investidor (N:N). |
+| `captacao` | Rodada de captação: `valor_alvo`, `valor_captado`, `percentual_equity_oferecido`, `status`, `data_inicio`. |
+
+Migrations disponíveis em `supabase/migrations/`:
+`video_pitch_url`, `founded_at`, `site_location`, `split_location`, `secondary_segments`, `limit_equity_offer`, `prevent_future_founding_date`, visibilidade de LinkedIn e ajustes de RLS.
+
+---
+
+## 📂 Estrutura do Repositório
+
+```text
+nexo/
+├── public/                     # Assets estáticos (favicon, imagem genérica, robots)
+├── src/
+│   ├── assets/                 # Imagens, vídeos e SVGs
+│   ├── auth/                   # AuthContext, AuthProvider, authApi e hook useAuth
+│   ├── components/             # Componentes de UI e páginas
+│   │   ├── AuthPage.tsx            # Login e cadastro
+│   │   ├── OnboardingPage.tsx      # Onboarding de perfil
+│   │   ├── EditProfilePage.tsx     # Edição de perfil
+│   │   ├── AppPlaceholder.tsx      # Dashboard principal
+│   │   ├── ExplorarRodadasPage.tsx # Catálogo de rodadas + filtros + modal
+│   │   ├── StartupProfilePreview.tsx / InvestorProfilePreview.tsx
+│   │   ├── Hero / HowItWorks / AudiencePaths / Segments / Faq / FinalCta / Header / Footer
+│   │   ├── SegmentIcon.tsx         # Ícone por segmento
+│   │   └── RangeSlider.tsx         # Slider de faixa (ticket)
+│   ├── data/                   # Dados e tipos da landing/perfil
+│   ├── lib/                    # supabase.ts e perfilApi.ts (acesso a dados)
+│   ├── utils/                  # documentos, localizacao, videos, perfilDraft
+│   ├── seed.ts                 # Script de seed (npm run seed)
+│   ├── App.tsx                 # Roteamento e proteção de rotas
+│   ├── index.css               # Tailwind + design system global
+│   └── main.tsx                # Entrada do React
+├── supabase/migrations/        # Migrations SQL versionadas
+├── .env.example                # Modelo de variáveis de ambiente
+├── vite.config.ts
+└── README.md
 ```
 
 ---
@@ -146,33 +215,14 @@ flowchart TD
 O projeto adota princípios de privacidade desde a concepção (*Privacy by Design*), de acordo com a **Lei Geral de Proteção de Dados (Lei nº 13.709/2018)**:
 
 ### 1. Dados Pessoais Tratados
-* **Identificação e Contato:** Nome, e-mail, telefone, cargo e vínculo institucional.
-* **Dados do Negócio:** Estágio, tese, faixas financeiras declaradas e métricas corporativas (sob consentimento e controle de visibilidade do usuário).
+* **Identificação e Contato:** nome, e-mail e vínculo institucional.
+* **Dados do Negócio:** CNPJ/CPF, estágio, tese, faixas financeiras declaradas, métricas da rodada de captação e localização aproximada (cidade/estado).
 
 ### 2. Segurança e Direitos
-* **Finalidade e Minimização:** Coleta estrita dos dados necessários para a operação do matchmaking.
-* **Segurança da Informação:** Proteção de senhas com *hash*, comunicação cifrada via HTTPS e controle restrito de acesso.
-* **Direitos do Titular:** Garantia de visualização, retificação e solicitação de exclusão dos dados cadastrais.
-
----
-
-## 📂 Estrutura Atual do Repositório
-
-```text
-nexo/
-├── app/                    # Frontend da aplicação (React + Vite + TypeScript)
-│   ├── public/             # Arquivos públicos e assets estáticos
-│   ├── src/                # Código-fonte da interface
-│   │   ├── assets/         # Imagens e recursos visuais
-│   │   ├── App.css         # Estilos da aplicação
-│   │   ├── App.tsx         # Componente principal com as telas do MVP
-│   │   ├── index.css       # Estilos globais
-│   │   └── main.tsx        # Ponto de entrada do React
-│   ├── package.json        # Dependências e scripts do frontend
-│   └── vite.config.ts      # Configuração do Vite
-├── nexo_logo.png           # Logotipo oficial da plataforma
-└── README.md               # Documentação do projeto
-```
+* **Autenticação:** gerenciada pelo Supabase Auth, com senhas jamais expostas ao cliente e confirmação de e-mail.
+* **Controle de Acesso:** **Row Level Security (RLS)** nas tabelas, garantindo que cada usuário só acesse o que lhe pertence.
+* **Finalidade e Minimização:** coleta estrita dos dados necessários para o matchmaking.
+* **Direitos do Titular:** edição e exclusão dos dados cadastrais via perfil, com base legal documentada.
 
 ---
 
@@ -180,25 +230,38 @@ nexo/
 
 ### Pré-requisitos
 * [Node.js](https://nodejs.org/) (versão 20.x ou superior recomendada)
-* Gerenciador de pacotes `npm` ou `yarn`
+* `npm`
+* Um projeto no [Supabase](https://supabase.com/) com as migrations aplicadas
 
 ### Passo a Passo
 ```bash
 # 1. Clonar o repositório
-git clone https://github.com/Pedro-Maciel77/nexo.git
-cd nexo
+git clone https://github.com/kiellzz/nexo.git
+cd nexo_p.i_2026.2
 
-# 2. Acessar a pasta do frontend
-cd app
-
-# 3. Instalar as dependências
+# 2. Instalar as dependências
 npm install
 
-# 4. Iniciar o servidor de desenvolvimento
+# 3. Configurar variáveis de ambiente (.env)
+#    VITE_SUPABASE_URL=...
+#    VITE_SUPABASE_ANON_KEY=...
+
+# 4. (Opcional) Popular o banco com dados de exemplo
+npm run seed
+
+# 5. Iniciar o servidor de desenvolvimento
 npm run dev
 ```
 
 Acesse no navegador: `http://localhost:5173`.
+
+### Scripts disponíveis
+| Script | Descrição |
+| :--- | :--- |
+| `npm run dev` | Sobe o servidor de desenvolvimento (Vite). |
+| `npm run build` | Checagem de tipos (`tsc -b`) + build de produção. |
+| `npm run preview` | Pré-visualiza o build de produção. |
+| `npm run seed` | Popula o Supabase com startups, investidores e rodadas de exemplo. |
 
 ---
 
