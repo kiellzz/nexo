@@ -11,7 +11,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Frontend-Concluído%20(React%2019)-brightgreen?style=for-the-badge&logo=react&logoColor=black" alt="Frontend" />
-  <img src="https://img.shields.io/badge/Backend%20API-Em%20Desenvolvimento-orange?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Backend" />
+  <img src="https://img.shields.io/badge/Backend-Spring%20Boot%203%20-%20Funcional-brightgreen?style=for-the-badge&logo=spring&logoColor=white" alt="Backend" />
   <img src="https://img.shields.io/badge/Banco%20de%20Dados-Em%20Estruturação-yellow?style=for-the-badge" alt="Banco de Dados" />
   <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Vite-6.x-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
@@ -69,8 +69,8 @@ Por meio de perfis estruturados, filtros detalhados e mecanismos de correspondê
 | **Mecanismo de Filtros & Oportunidades** | `Concluído (UI)` | Filtros dinâmicos por segmento, ticket e estágio no frontend |
 | **Fluxo de Matchmaking & Interesse** | `Concluído (UI)` | Simulação visual de registro de interesse e status de match |
 | **Dashboard de Oportunidades** | `Concluído (UI)` | Painéis e métricas renderizados no cliente |
-| **Backend REST API (Node.js)** | `Em Desenvolvimento` | Estruturação dos serviços e endpoints REST |
-| **Banco de Dados Integrado** | `Em Desenvolvimento` | Modelagem e integração do banco de dados persistente |
+| **Backend REST API (Spring Boot 3)** | `Concluído` | API REST com 5 endpoints CRUD, Swagger UI, H2/PostgreSQL |
+| **Banco de Dados** | `Concluído` | H2 em memória (testes) + PostgreSQL configurado |
 
 ---
 
@@ -102,18 +102,18 @@ A arquitetura do projeto foi desenhada seguindo o modelo **cliente-servidor desa
 ```mermaid
 flowchart TD
     Client["Frontend SPA / PWA (React 19 + TypeScript + Vite)"]
-    API["Backend REST API (Node.js - Em Desenvolvimento)"]
-    DB[("Banco de Dados Integrado (Em Desenvolvimento)")]
-    IA["Módulo de Matchmaking / Filtros Inteligentes"]
+    API["Backend REST API (Spring Boot 3)"]
+    DB[("Banco de Dados (H2 / PostgreSQL)")]
 
     Client <-->|"HTTP / REST"| API
-    API <-->|"Persistência / Queries"| DB
-    API <-->|"Processamento de Score"| IA
+    API <-->|"JPA / Hibernate"| DB
 ```
 
 ### Stack Tecnológica
 * **Frontend:** [React 19](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite](https://vite.dev/), PWA e CSS moderno.
-* **Backend (em construção):** [Node.js](https://nodejs.org/), API RESTful com arquitetura desacoplada.
+* **Backend:** [Spring Boot 3.3.5](https://spring.io/projects/spring-boot), Java 17+, API RESTful com Spring Data JPA.
+* **Banco de Dados:** [H2](https://www.h2database.com) (em memória) + [PostgreSQL](https://www.postgresql.org/).
+* **Documentação:** [Springdoc OpenAPI](https://springdoc.org) v2.6.0 (Swagger UI).
 * **Linter & Qualidade de Código:** [Oxlint](https://oxc-project.github.io/), Git e GitHub.
 
 ---
@@ -170,8 +170,23 @@ nexo/
 │   │   └── main.tsx        # Ponto de entrada do React
 │   ├── package.json        # Dependências e scripts do frontend
 │   └── vite.config.ts      # Configuração do Vite
-├── nexo_logo.png           # Logotipo oficial da plataforma
-└── README.md               # Documentação do projeto
+├── backend/                # Backend da aplicação (Spring Boot 3)
+│   ├── src/main/
+│   │   ├── java/com/nexo/startup/  # Código-fonte Java
+│   │   │   ├── controller/         # Controladores REST (5 endpoints)
+│   │   │   ├── service/            # Lógica de negócio
+│   │   │   ├── repository/         # Repositórios JPA
+│   │   │   ├── entity/             # Entidades JPA
+│   │   │   ├── dto/                # DTOs de requisição/resposta
+│   │   │   ├── mapper/             # Mapeadores
+│   │   │   ├── config/             # OpenAPI, CORS
+│   │   │   └── exception/          # Handlers de exceção
+│   │   └── resources/
+│   │       └── application.properties
+│   ├── pom.xml                   # Dependências Maven
+│   └── README.md                 # Documentação do backend
+├── nexo_logo.png                 # Logotipo oficial da plataforma
+└── README.md                     # Documentação do projeto
 ```
 
 ---
@@ -179,26 +194,52 @@ nexo/
 ## 💻 Como Executar o Projeto
 
 ### Pré-requisitos
-* [Node.js](https://nodejs.org/) (versão 20.x ou superior recomendada)
+* **JDK 17 ou superior** instalado
+* **Maven** instalado
+* [Node.js](https://nodejs.org/) (versão 20.x ou superior recomendada) para o frontend
 * Gerenciador de pacotes `npm` ou `yarn`
 
 ### Passo a Passo
-```bash
-# 1. Clonar o repositório
-git clone https://github.com/Pedro-Maciel77/nexo.git
-cd nexo
 
-# 2. Acessar a pasta do frontend
+#### 1. Backend (Spring Boot)
+```bash
+# Acessar a pasta do backend
+cd backend
+
+# Iniciar o servidor
+mvn spring-boot:run
+```
+
+O backend ficará disponível em `http://localhost:8080`.
+
+- **Swagger UI**: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+- **API JSON**: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
+
+#### 2. Frontend (React)
+```bash
+# Acessar a pasta do frontend
 cd app
 
-# 3. Instalar as dependências
+# Instalar as dependências
 npm install
 
-# 4. Iniciar o servidor de desenvolvimento
+# Iniciar o servidor de desenvolvimento
 npm run dev
 ```
 
 Acesse no navegador: `http://localhost:5173`.
+
+#### 3. Banco de Dados
+- **Padrão**: H2 em memória (já configurado para testes rápidos)
+- **Produção**: Configure o PostgreSQL alterando o `src/main/resources/application.properties`:
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/nexo
+spring.datasource.username=postgres
+spring.datasource.password=postgres
+```
+```sql
+CREATE DATABASE nexo;
+```
 
 ---
 
