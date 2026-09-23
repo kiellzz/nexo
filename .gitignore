@@ -1,0 +1,26 @@
+# Dependencies
+node_modules
+target/
+
+# Build artifacts
+dist/
+dist-ssr/
+*.class
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Environment and local files
+.env
+*.local
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.iml
+*.suo
+*.sln
+.DS_Store
+Thumbs.db

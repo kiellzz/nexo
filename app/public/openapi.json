@@ -1,0 +1,495 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "NEXO Startup Management API",
+    "description": "API REST para gerenciamento e catálogo completo de Startups no ecossistema NEXO. Permite cadastrar, consultar, atualizar e excluir startups, fornecendo metadados essenciais para análise de investimento e conexões de mercado.",
+    "contact": {
+      "name": "NEXO Core Team",
+      "url": "https://nexo.app",
+      "email": "contato@nexo.app"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Servidor Local de Desenvolvimento (Spring Boot)"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Startups",
+      "description": "Endpoints de gerenciamento e catálogo das Startups cadastradas na plataforma NEXO"
+    }
+  ],
+  "paths": {
+    "/api/startups": {
+      "get": {
+        "tags": [
+          "Startups"
+        ],
+        "summary": "Listar startups cadastradas",
+        "description": "Retorna a coleção de todas as startups cadastradas no NEXO. Permite filtragem dinâmica por termo de busca (nome/descrição), setor, estágio de maturação e UF.",
+        "operationId": "findAll",
+        "parameters": [
+          {
+            "name": "busca",
+            "in": "query",
+            "description": "Busca textual por nome ou descrição",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "setor",
+            "in": "query",
+            "description": "Filtro por setor de mercado (ex: EdTech, FinTech)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "estagio",
+            "in": "query",
+            "description": "Filtro por estágio de maturidade",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/EstagioStartup"
+            }
+          },
+          {
+            "name": "estado",
+            "in": "query",
+            "description": "Filtro por Unidade Federativa (UF com 2 letras, ex: SP)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Startups listadas com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StartupResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parâmetros de consulta inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Startups"
+        ],
+        "summary": "Cadastrar nova startup",
+        "description": "Cria um novo registro de startup no ecossistema NEXO com validação de campos obrigatórios.",
+        "operationId": "create",
+        "requestBody": {
+          "description": "Dados para cadastro da nova startup",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartupRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Startup cadastrada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartupResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados do corpo da requisição inválidos ou campos obrigatórios ausentes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/startups/{id}": {
+      "get": {
+        "tags": [
+          "Startups"
+        ],
+        "summary": "Obter startup por ID",
+        "description": "Recupera os detalhes completos de uma startup registrada através do seu identificador único UUID.",
+        "operationId": "findById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "UUID v4 da startup",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Startup encontrada e retornada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartupResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Formato de UUID inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nenhuma startup encontrada com o ID informado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Startups"
+        ],
+        "summary": "Atualizar dados de uma startup",
+        "description": "Modifica as informações de uma startup existente a partir de seu identificador UUID.",
+        "operationId": "update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "UUID v4 da startup",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Dados atualizados da startup",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartupRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Startup atualizada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartupResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados de requisição inválidos ou campos com formato incorreto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Startup não localizada para o UUID fornecido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Startups"
+        ],
+        "summary": "Excluir startup",
+        "description": "Exclui permanentemente o registro de uma startup do banco de dados pelo seu UUID.",
+        "operationId": "delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "UUID v4 da startup",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Startup excluída com sucesso (sem conteúdo no corpo)"
+          },
+          "400": {
+            "description": "Formato de UUID inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Startup não localizada para o UUID informado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EstagioStartup": {
+        "type": "string",
+        "description": "Estágio de maturidade da startup no ecossistema de venture capital",
+        "enum": [
+          "IDEIA",
+          "MVP",
+          "SEED",
+          "SERIES_A"
+        ]
+      },
+      "StartupRequest": {
+        "type": "object",
+        "required": [
+          "estagio",
+          "nome",
+          "setor"
+        ],
+        "properties": {
+          "nome": {
+            "maxLength": 150,
+            "minLength": 2,
+            "type": "string",
+            "description": "Nome comercial ou razão da startup",
+            "example": "NovaFlow AI"
+          },
+          "descricao": {
+            "maxLength": 2000,
+            "type": "string",
+            "description": "Descrição detalhada do modelo de negócio e proposta de valor",
+            "example": "Plataforma de otimização logística em tempo real impulsionada por modelos preditivos."
+          },
+          "setor": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Setor ou mercado de atuação",
+            "example": "Logística & Supply Chain"
+          },
+          "estagio": {
+            "$ref": "#/components/schemas/EstagioStartup"
+          },
+          "captacaoObjetivo": {
+            "type": "number",
+            "description": "Valor pretendido de captação na rodada (em R$)",
+            "example": 1500000.00
+          },
+          "equityOferecida": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "type": "number",
+            "description": "Percentual de participação acionária ofertada aos investidores (%)",
+            "example": 15.00
+          },
+          "cidade": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Cidade sede da startup",
+            "example": "São Paulo"
+          },
+          "estado": {
+            "pattern": "^[A-Z]{2}$",
+            "type": "string",
+            "description": "Sigla da Unidade Federativa (UF com 2 letras)",
+            "example": "SP"
+          },
+          "website": {
+            "maxLength": 255,
+            "type": "string",
+            "description": "Endereço do website oficial",
+            "example": "https://novaflow.com.br"
+          },
+          "logoUrl": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "URL com o logotipo ou imagem de avatar da startup",
+            "example": "https://cdn.nexo.app/logos/novaflow.png"
+          }
+        },
+        "description": "Payload para criação ou atualização de uma Startup"
+      },
+      "StartupResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Identificador único universal (UUID v4)",
+            "example": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+          },
+          "nome": {
+            "type": "string",
+            "description": "Nome comercial da startup",
+            "example": "NovaFlow AI"
+          },
+          "descricao": {
+            "type": "string",
+            "description": "Descrição da startup e proposta de valor",
+            "example": "Plataforma de otimização logística com inteligência artificial."
+          },
+          "setor": {
+            "type": "string",
+            "description": "Setor ou mercado de atuação",
+            "example": "Logística & Supply Chain"
+          },
+          "estagio": {
+            "$ref": "#/components/schemas/EstagioStartup"
+          },
+          "captacaoObjetivo": {
+            "type": "number",
+            "description": "Valor pretendido de captação (R$)",
+            "example": 1500000.00
+          },
+          "equityOferecida": {
+            "type": "number",
+            "description": "Percentual de participação oferecida (%)",
+            "example": 15.00
+          },
+          "cidade": {
+            "type": "string",
+            "description": "Cidade sede",
+            "example": "São Paulo"
+          },
+          "estado": {
+            "type": "string",
+            "description": "Sigla do Estado (UF)",
+            "example": "SP"
+          },
+          "website": {
+            "type": "string",
+            "description": "Website institucional",
+            "example": "https://novaflow.com.br"
+          },
+          "logoUrl": {
+            "type": "string",
+            "description": "URL do logotipo",
+            "example": "https://cdn.nexo.app/logos/novaflow.png"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data e hora de registro no sistema",
+            "example": "2026-09-23T15:30:00"
+          }
+        },
+        "description": "Representação pública de uma Startup no catálogo do NEXO"
+      },
+      "ApiErrorResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "example": 400
+          },
+          "error": {
+            "type": "string",
+            "example": "Bad Request"
+          },
+          "message": {
+            "type": "string",
+            "example": "Dados da requisição inválidos"
+          },
+          "path": {
+            "type": "string",
+            "example": "/api/startups"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-09-23T15:30:00"
+          },
+          "fieldErrors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Detalhes dos campos com falha de validação"
+          }
+        },
+        "description": "Estrutura padrão de erro da API"
+      }
+    }
+  }
+}
+

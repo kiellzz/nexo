@@ -68,6 +68,14 @@ export function SocialNavbar({
           </NavLink>
 
           <NavLink
+            to="/startups"
+            className={({ isActive }) => `social-nav-link ${isActive ? 'active' : ''}`}
+          >
+            <span className="nav-icon">🏢</span>
+            <span className="nav-text">Startups</span>
+          </NavLink>
+
+          <NavLink
             to="/negociacoes"
             className={({ isActive }) => `social-nav-link ${isActive ? 'active' : ''}`}
           >

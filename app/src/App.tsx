@@ -20,6 +20,10 @@ import { StartupRegisterPage } from './pages/StartupRegisterPage'
 import { StartupStatusPage } from './pages/StartupStatusPage'
 import { AdminPage } from './pages/AdminPage'
 import { StartupAnalysisPage } from './pages/StartupAnalysisPage'
+import { StartupsListPage } from './pages/StartupsListPage'
+import { StartupFormPage } from './pages/StartupFormPage'
+import { StartupDetailPage } from './pages/StartupDetailPage'
+import { SwaggerUiPage } from './pages/SwaggerUiPage'
 import {
   startups as initialStartups,
   investors,
@@ -196,6 +200,14 @@ function AppContent() {
             element={<StartupAnalysisPage pendingStartups={pendingStartups} />}
           />
 
+          {/* CRUD Startups (OpenAPI & Spring Boot) */}
+          <Route path="/startups" element={<StartupsListPage />} />
+          <Route path="/startups/nova" element={<StartupFormPage />} />
+          <Route path="/startups/:id" element={<StartupDetailPage />} />
+          <Route path="/startups/:id/editar" element={<StartupFormPage />} />
+          <Route path="/swagger" element={<SwaggerUiPage />} />
+          <Route path="/api-docs" element={<SwaggerUiPage />} />
+
           {/* Páginas Institucionais & Auxiliares */}
           <Route path="/oportunidades" element={<OpportunitiesPage />} />
           <Route path="/matches" element={<MatchesPage />} />
@@ -214,6 +226,7 @@ function AppContent() {
           <Link to="/feed">Feed da Rede</Link>
           <Link to="/explorar">Explorar</Link>
           <Link to="/catalogo">Catálogo</Link>
+          <Link to="/startups">Startups (CRUD)</Link>
           <Link to="/negociacoes">Negociações</Link>
           <Link to="/privacidade">Termos de uso</Link>
           <Link to="/privacidade">Política de privacidade</Link>

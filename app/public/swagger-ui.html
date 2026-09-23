@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>NEXO &mdash; OpenAPI 3.0 Interactive Swagger UI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/logo.png">
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.18.2/swagger-ui.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: #09090b !important;
+      color: #fafafa !important;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+    }
+    .nexo-top-header {
+      background: #111113;
+      border-bottom: 1px solid #27272a;
+      padding: 0.85rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .nexo-brand-area {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .nexo-brand-area img {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+    }
+    .nexo-brand-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fafafa;
+      letter-spacing: -0.02em;
+    }
+    .nexo-badge {
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #818cf8;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.2rem 0.65rem;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .nexo-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+    .btn-nexo-nav {
+      background: #18181b;
+      border: 1px solid #27272a;
+      color: #fafafa;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .btn-nexo-nav:hover {
+      background: #27272a;
+      border-color: #3f3f46;
+    }
+    .btn-nexo-primary {
+      background: #6366f1;
+      border: none;
+      color: #ffffff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.5rem 1.15rem;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+    .btn-nexo-primary:hover {
+      background: #4f46e5;
+    }
+    .swagger-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 5rem 1.5rem;
+    }
+
+    /* Complete Dark Theme Overrides for Swagger UI */
+    .swagger-ui {
+      color: #d4d4d8 !important;
+    }
+    .swagger-ui .wrapper,
+    .swagger-ui .scheme-container,
+    .swagger-ui .opblock-body,
+    .swagger-ui .opblock-section-header,
+    .swagger-ui .responses-inner,
+    .swagger-ui .responses-table,
+    .swagger-ui .response-col_status,
+    .swagger-ui .response-col_description,
+    .swagger-ui table,
+    .swagger-ui table thead tr th,
+    .swagger-ui table tbody tr td,
+    .swagger-ui .parameters-container,
+    .swagger-ui .parameter__name,
+    .swagger-ui .parameter__type,
+    .swagger-ui .parameter__deprecated,
+    .swagger-ui .parameter__in,
+    .swagger-ui .tab,
+    .swagger-ui .tab li,
+    .swagger-ui .tabheader,
+    .swagger-ui section.models,
+    .swagger-ui .model-box,
+    .swagger-ui .model-box-control,
+    .swagger-ui .model-container,
+    .swagger-ui .highlight-code,
+    .swagger-ui .microlight,
+    .swagger-ui .body-param__text,
+    .swagger-ui .example,
+    .swagger-ui .model-example {
+      background: #111113 !important;
+      color: #fafafa !important;
+      border-color: #27272a !important;
+    }
+    .swagger-ui .info .title {
+      color: #fafafa !important;
+      font-weight: 700;
+    }
+    .swagger-ui .info p,
+    .swagger-ui .info li,
+    .swagger-ui .info table {
+      color: #a1a1aa !important;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .swagger-ui .opblock-tag {
+      color: #fafafa !important;
+      border-bottom: 1px solid #27272a !important;
+      padding: 14px 0;
+    }
+    .swagger-ui .opblock-tag small {
+      color: #71717a !important;
+    }
+    .swagger-ui .opblock {
+      background: #111113 !important;
+      border: 1px solid #27272a !important;
+      border-radius: 14px !important;
+      box-shadow: none !important;
+      margin: 0 0 16px 0 !important;
+    }
+    .swagger-ui .opblock:hover {
+      border-color: #3f3f46 !important;
+    }
+    .swagger-ui .opblock.opblock-get {
+      border-left: 4px solid #3b82f6 !important;
+    }
+    .swagger-ui .opblock.opblock-get .opblock-summary-method {
+      background: #3b82f6 !important;
+    }
+    .swagger-ui .opblock.opblock-post {
+      border-left: 4px solid #10b981 !important;
+    }
+    .swagger-ui .opblock.opblock-post .opblock-summary-method {
+      background: #10b981 !important;
+    }
+    .swagger-ui .opblock.opblock-put {
+      border-left: 4px solid #f59e0b !important;
+    }
+    .swagger-ui .opblock.opblock-put .opblock-summary-method {
+      background: #f59e0b !important;
+    }
+    .swagger-ui .opblock.opblock-delete {
+      border-left: 4px solid #ef4444 !important;
+    }
+    .swagger-ui .opblock.opblock-delete .opblock-summary-method {
+      background: #ef4444 !important;
+    }
+    .swagger-ui .opblock-summary-path,
+    .swagger-ui .opblock-summary-path__deprecated {
+      color: #fafafa !important;
+      font-weight: 600;
+    }
+    .swagger-ui .opblock-summary-description {
+      color: #a1a1aa !important;
+    }
+    .swagger-ui .parameters-col_name {
+      color: #fafafa !important;
+    }
+    .swagger-ui .parameter__name.required:after {
+      color: #ef4444 !important;
+    }
+    .swagger-ui .parameter__type {
+      color: #818cf8 !important;
+    }
+    .swagger-ui input[type=text],
+    .swagger-ui select,
+    .swagger-ui textarea {
+      background: #18181b !important;
+      border: 1px solid #3f3f46 !important;
+      color: #fafafa !important;
+      border-radius: 8px !important;
+      padding: 8px 12px !important;
+    }
+    .swagger-ui input[type=text]:focus,
+    .swagger-ui select:focus,
+    .swagger-ui textarea:focus {
+      border-color: #6366f1 !important;
+      outline: none !important;
+    }
+    .swagger-ui .body-param__text {
+      background: #18181b !important;
+      color: #a5b4fc !important;
+      border: 1px solid #3f3f46 !important;
+    }
+    .swagger-ui pre,
+    .swagger-ui .highlight-code pre,
+    .swagger-ui .example pre {
+      background: #09090b !important;
+      color: #d4d4d8 !important;
+      border: 1px solid #27272a !important;
+      border-radius: 8px !important;
+    }
+    .swagger-ui .btn {
+      background: #18181b !important;
+      color: #fafafa !important;
+      border: 1px solid #27272a !important;
+      border-radius: 8px !important;
+    }
+    .swagger-ui .btn.execute {
+      background: #6366f1 !important;
+      border: none !important;
+      color: #ffffff !important;
+      font-weight: 600;
+    }
+    .swagger-ui .btn.execute:hover {
+      background: #4f46e5 !important;
+    }
+    .swagger-ui .btn.try-out__btn {
+      background: #27272a !important;
+      border-color: #3f3f46 !important;
+      color: #fafafa !important;
+    }
+    .swagger-ui .response-col_status {
+      color: #fafafa !important;
+      font-weight: 700;
+    }
+    .swagger-ui .response-col_description {
+      color: #d4d4d8 !important;
+    }
+    .swagger-ui section.models {
+      border: 1px solid #27272a !important;
+      border-radius: 14px !important;
+      background: #111113 !important;
+    }
+    .swagger-ui section.models h4 {
+      color: #fafafa !important;
+      border-bottom: 1px solid #27272a !important;
+    }
+    .swagger-ui .model-box {
+      background: #18181b !important;
+    }
+    .swagger-ui .model-title {
+      color: #fafafa !important;
+    }
+    .swagger-ui .model {
+      color: #d4d4d8 !important;
+    }
+    .swagger-ui .prop-type {
+      color: #818cf8 !important;
+    }
+    .swagger-ui .property.primitive {
+      color: #fafafa !important;
+    }
+    .swagger-ui svg:not(:root) {
+      fill: #a1a1aa !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header Bar -->
+  <header class="nexo-top-header">
+    <div class="nexo-brand-area">
+      <img src="/logo.png" alt="Nexo Logo">
+      <span class="nexo-brand-name">NEXO</span>
+      <span class="nexo-badge">OpenAPI 3.0 &bull; Swagger UI</span>
+    </div>
+    <div class="nexo-actions">
+      <a href="/startups" class="btn-nexo-nav">&larr; Voltar para Startups (CRUD)</a>
+      <a href="/openapi.json" target="_blank" class="btn-nexo-nav">Ver openapi.json</a>
+      <button type="button" class="btn-nexo-primary" onclick="window.location.reload()">Recarregar</button>
+    </div>
+  </header>
+
+  <!-- Swagger UI Root Container -->
+  <div class="swagger-container">
+    <div id="swagger-ui"></div>
+  </div>
+
+  <script src="https://unpkg.com/swagger-ui-dist@5.18.2/swagger-ui-bundle.js"></script>
+  <script src="https://unpkg.com/swagger-ui-dist@5.18.2/swagger-ui-standalone-preset.js"></script>
+  <script>
+    window.onload = function() {
+      window.ui = SwaggerUIBundle({
+        url: '/openapi.json',
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        plugins: [
+          SwaggerUIBundle.plugins.DownloadUrl
+        ],
+        layout: "BaseLayout",
+        defaultModelsExpandDepth: 2,
+        defaultModelExpandDepth: 2,
+        docExpansion: 'list',
+        displayRequestDuration: true,
+        filter: true,
+        showExtensions: true,
+        showCommonExtensions: true
+      });
+    };
+  </script>
+</body>
+</html>
